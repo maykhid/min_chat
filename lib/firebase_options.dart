@@ -70,6 +70,7 @@ class DefaultFirebaseOptions {
     projectId: 'henry-test-2',
     databaseURL: 'https://henry-test-2.firebaseio.com',
     storageBucket: 'henry-test-2.appspot.com',
+    iosClientId: '487400574928-odfgo77foqdlhuj3o201nj67hct2rutg.apps.googleusercontent.com',
     iosBundleId: 'com.example.minChat',
   );
 
@@ -80,6 +81,7 @@ class DefaultFirebaseOptions {
     projectId: 'henry-test-2',
     databaseURL: 'https://henry-test-2.firebaseio.com',
     storageBucket: 'henry-test-2.appspot.com',
+    iosClientId: '487400574928-k3ae8l1dn2tis6hthome1el530anc52q.apps.googleusercontent.com',
     iosBundleId: 'com.example.minChat.RunnerTests',
   );
 }

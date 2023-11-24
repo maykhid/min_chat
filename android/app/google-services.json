@@ -30,6 +30,13 @@
             {
               "client_id": "487400574928-57qoem8f3ujue2s46djpfrvqogeaahjs.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "487400574928-k3ae8l1dn2tis6hthome1el530anc52q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.minChat.RunnerTests"
+              }
             }
           ]
         }
@@ -59,6 +66,13 @@
             {
               "client_id": "487400574928-57qoem8f3ujue2s46djpfrvqogeaahjs.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "487400574928-k3ae8l1dn2tis6hthome1el530anc52q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.minChat.RunnerTests"
+              }
             }
           ]
         }
