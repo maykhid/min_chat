@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:min_chat/core/navigation/app_navigation_config.dart';
 
 class MinChat extends StatelessWidget {
   const MinChat({super.key});
@@ -6,12 +8,18 @@ class MinChat extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Container(),
+    final textTheme = Theme.of(context).textTheme;
+    
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
+            bodySmall: GoogleFonts.oswald(textStyle: textTheme.bodySmall),
+          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: false,
+        ),
+        routerConfig: AppRouterConfig.goRouter,
     );
   }
 }
