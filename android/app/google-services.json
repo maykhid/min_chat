@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "487400574928",
+    "firebase_url": "https://henry-test-2.firebaseio.com",
+    "project_id": "henry-test-2",
+    "storage_bucket": "henry-test-2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487400574928:android:a024e48048903e645533d5",
+        "android_client_info": {
+          "package_name": "com.example.min_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487400574928-57qoem8f3ujue2s46djpfrvqogeaahjs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx4ktMVp4LP-3RlP9GRVz2VOEBySAJnek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487400574928-57qoem8f3ujue2s46djpfrvqogeaahjs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487400574928:android:5407b5cd82d79d625533d5",
+        "android_client_info": {
+          "package_name": "com.example.trove_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487400574928-57qoem8f3ujue2s46djpfrvqogeaahjs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx4ktMVp4LP-3RlP9GRVz2VOEBySAJnek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487400574928-57qoem8f3ujue2s46djpfrvqogeaahjs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
