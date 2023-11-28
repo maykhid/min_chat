@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -112,49 +114,57 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             curve: Curves.easeInOut,
             margin: EdgeInsets.only(bottom: _bottomOffset),
             child: Material(
+              color: Colors.transparent,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        // controller: TextEditingController(),
-                        maxLines: null,
-                        enabled: true,
-                        // expands: true,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          filled: true,
-                          // fillColor: AppColors.lightGrey3,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              width: 0,
-                              color: Colors.transparent,
-                              style: BorderStyle.none,
+                child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: 3,
+                          sigmaY: 3,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                // controller: TextEditingController(),
+                                maxLines: null,
+                                enabled: true,
+                                // expands: true,
+                                textAlignVertical: TextAlignVertical.center,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  // fillColor: AppColors.lightGrey3,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(
+                                      width: 0,
+                                      color: Colors.transparent,
+                                      style: BorderStyle.none,
+                                    ),
+                                  ),
+                                  hintText: 'new message',
+                                ),
+                              ),
                             ),
-                          ),
-                          hintText: 'new message',
+                            const Gap(12),
+                            const FaIcon(FontAwesomeIcons.paperPlane),
+                          ],
                         ),
                       ),
                     ),
-                    const Gap(12),
-                    const FaIcon(FontAwesomeIcons.paperPlane),
-                  ],
-                ),
               ),
             ),
           ),
         ),
-        
       ],
     );
   }
@@ -173,9 +183,9 @@ class RecipientChatBubble extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.pinkAccent.shade200,
-              borderRadius: const BorderRadiusDirectional.only(
+            decoration: const BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadiusDirectional.only(
                 topEnd: Radius.circular(8),
                 bottomEnd: Radius.circular(8),
                 bottomStart: Radius.circular(8),
@@ -185,6 +195,8 @@ class RecipientChatBubble extends StatelessWidget {
               // width: 200,
               child: Text(
                 '''Yes ma, I would. ''',
+                style: TextStyle(color: Colors.white),
+                textWidthBasis: TextWidthBasis.longestLine,
               ),
             ),
           ),
@@ -220,9 +232,9 @@ class SenderChatBubble extends StatelessWidget {
             // height: 56,
             // width: 200,
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.pink.shade200,
-              borderRadius: const BorderRadiusDirectional.only(
+            decoration: const BoxDecoration(
+              color: Colors.black12,
+              borderRadius: BorderRadiusDirectional.only(
                 topStart: Radius.circular(8),
                 bottomEnd: Radius.circular(8),
                 bottomStart: Radius.circular(8),
