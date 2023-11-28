@@ -51,7 +51,7 @@ class FirebaseAuthentication implements IAuthentication {
       if (userCredential.additionalUserInfo!.isNewUser) {
         // TODO(maykhid): check that mID has not been previously assigned to a user
 
-        final mID = generateMID();
+        final mID = generateMID;
 
         final authenticatedUser = AuthenticatedUser(
           id: _user?.uid ?? '',
@@ -84,7 +84,5 @@ class FirebaseAuthentication implements IAuthentication {
   // @override
   // AuthenticatedUser get user => _authenticatedUser;
 
-  String generateMID() {
-    return '${generatePrefixForID()}${generateSuffixForID(2)}';
-  }
+  String get generateMID => '${generatePrefixForID()}${generateSuffixForID(2)}';
 }
