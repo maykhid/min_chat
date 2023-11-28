@@ -11,6 +11,7 @@ environment:
 
 dependencies:
   bloc: ^8.1.2
+  cloud_firestore: ^4.13.2
   cupertino_icons: ^1.0.2
   equatable: ^2.0.5
   firebase_auth: ^4.13.0
@@ -24,9 +25,14 @@ dependencies:
   go_router: ^12.1.1
   google_fonts: ^6.1.0
   google_sign_in: ^6.1.6
-  injectable: ^2.3.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  injectable:
   intl: ^0.18.1
+  path: ^1.8.3
+  path_provider: ^2.1.1
   redacted: ^1.0.11
+  shared_preferences: ^2.2.2
   toastification: ^1.1.0
   very_good_analysis: ^5.1.0
 
@@ -35,6 +41,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+  hive_generator:
   injectable_generator:
 
   

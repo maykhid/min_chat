@@ -1,25 +1,24 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 import 'package:min_chat/app/features/auth/data/authentication_interface.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
+import 'package:min_chat/core/utils/helpers.dart';
 
-@Singleton(as: AuthenticationInterface)
-class FirebaseAuthentication implements AuthenticationInterface {
+@Singleton(as: IAuthentication)
+class FirebaseAuthentication implements IAuthentication {
   FirebaseAuthentication({
     required FirebaseAuth firebaseAuth,
-  }) : _firebaseAuth = firebaseAuth {
-    _firebaseAuth.authStateChanges().listen((user) {
-      if (user != null) {
-        _user = user;
-      } else {
-        _user = null;
-      }
-    });
+    required FirebaseFirestore firebaseFirestore,
+  })  : _firebaseAuth = firebaseAuth,
+        _firebaseFirestore = firebaseFirestore {
+    _firebaseAuth.authStateChanges().listen((user) => _user = user);
   }
 
   final FirebaseAuth _firebaseAuth;
+  final FirebaseFirestore _firebaseFirestore;
+
   User? _user;
 
   @override
@@ -35,7 +34,7 @@ class FirebaseAuthentication implements AuthenticationInterface {
   }
 
   @override
-  Future<void> signInWithGoogle() async {
+  Future<AuthenticatedUser> signInWithGoogle() async {
     try {
       final googleUser = await GoogleSignIn().signIn();
 
@@ -46,7 +45,35 @@ class FirebaseAuthentication implements AuthenticationInterface {
         idToken: googleAuth?.idToken,
       );
 
-      await _firebaseAuth.signInWithCredential(credential);
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        // TODO(maykhid): check that mID has not been previously assigned to a user
+
+        final mID = generateMID();
+
+        final authenticatedUser = AuthenticatedUser(
+          id: _user?.uid ?? '',
+          name: _user?.displayName,
+          email: _user?.email,
+          mID: mID,
+          imageUrl: _user?.photoURL,
+        );
+
+        // create firestore user
+        await _firebaseFirestore
+            .collection('users')
+            .doc(_user?.uid)
+            .set(authenticatedUser.toMap());
+
+        return authenticatedUser;
+      } else {
+        final snapshot =
+            await _firebaseFirestore.collection('users').doc(_user?.uid).get();
+        final userMap = snapshot.data();
+        return AuthenticatedUser.fromMap(userMap!);
+      }
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {
@@ -54,13 +81,10 @@ class FirebaseAuthentication implements AuthenticationInterface {
     }
   }
 
-  @override
-  AuthenticatedUser get user {
-    return AuthenticatedUser(
-      id: _user?.uid ?? '',
-      name: _user?.displayName,
-      email: _user?.email,
-      imageUrl: _user?.photoURL,
-    );
+  // @override
+  // AuthenticatedUser get user => _authenticatedUser;
+
+  String generateMID() {
+    return '${generatePrefixForID()}${generateSuffixForID(2)}';
   }
 }
