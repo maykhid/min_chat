@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
+import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
+import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/utils/string_x.dart';
 
+@Singleton(as: IChat)
 class FirebaseChat implements IChat {
   FirebaseChat({required FirebaseFirestore firebaseFirestore})
       : _firebaseFirestore = firebaseFirestore;
@@ -9,19 +13,19 @@ class FirebaseChat implements IChat {
   final FirebaseFirestore _firebaseFirestore;
 
   @override
-  Future<void> startConversation({
-    required String recipientMidOrEmail,
-    required String senderMid,
+  Future<AuthenticatedUser> startConversation({
+    required String recipientMIdOrEmail,
+    required String senderMId,
   }) async {
     try {
       late final QuerySnapshot<Map<String, dynamic>> userDocument;
 
-      if (recipientMidOrEmail.isEmail) {
+      if (recipientMIdOrEmail.isEmail) {
         userDocument = await _firebaseFirestore
             .collection('users')
             .where(
               'email',
-              isEqualTo: recipientMidOrEmail,
+              isEqualTo: recipientMIdOrEmail,
             )
             .get();
       } else {
@@ -29,26 +33,41 @@ class FirebaseChat implements IChat {
             .collection('users')
             .where(
               'mID',
-              isEqualTo: recipientMidOrEmail,
+              isEqualTo: recipientMIdOrEmail,
             )
             .get();
       }
 
       if (userDocument.docs.isNotEmpty) {
-        final conversationDocument =
-            _firebaseFirestore.collection('conversations').doc();
-
         final recipient = userDocument.docs.first.data();
 
-        await _firebaseFirestore
-            .collection('chats')
-            .doc(conversationDocument.id)
-            .set({
-          'participants': [recipient['mID'], senderMid],
+        final docId = '${recipient['mID']}$senderMId';
+
+        final conversationDocument =
+            _firebaseFirestore.collection('conversations').doc(docId);
+
+        await conversationDocument.set({
+          'participants': [recipient['mID'], senderMId],
         });
+        return AuthenticatedUser.fromMap(recipient);
       } else {
         throw Exception('User not found!');
       }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> sendMessage({required Message message}) async {
+    try {
+      final docId = '${message.recipientMId}${message.senderMId}';
+      final conversationDocument =
+          _firebaseFirestore.collection('conversations').doc(docId);
+
+      final messageDocument = conversationDocument.collection('messages').doc();
+
+      await messageDocument.set(message.toMap());
     } catch (e) {
       throw Exception(e);
     }

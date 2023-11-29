@@ -3,6 +3,8 @@ import 'package:hive/hive.dart';
 
 part 'authenticated_user.g.dart';
 
+// TODO(maykhid): change this class name
+
 @HiveType(typeId: 0)
 class AuthenticatedUser extends HiveObject with EquatableMixin{
   AuthenticatedUser({
