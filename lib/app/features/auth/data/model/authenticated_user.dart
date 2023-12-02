@@ -6,8 +6,8 @@ part 'authenticated_user.g.dart';
 // TODO(maykhid): change this class name
 
 @HiveType(typeId: 0)
-class AuthenticatedUser extends HiveObject with EquatableMixin{
-  AuthenticatedUser({
+class MinChatUser extends HiveObject with EquatableMixin {
+  MinChatUser({
     required this.id,
     this.name,
     this.email,
@@ -15,8 +15,7 @@ class AuthenticatedUser extends HiveObject with EquatableMixin{
     this.imageUrl,
   });
 
-  factory AuthenticatedUser.fromMap(Map<String, dynamic> map) =>
-      AuthenticatedUser(
+  factory MinChatUser.fromMap(Map<String, dynamic> map) => MinChatUser(
         id: map['id'] as String,
         name: map['name'] as String,
         email: map['email'] as String,
@@ -50,13 +49,13 @@ class AuthenticatedUser extends HiveObject with EquatableMixin{
   }
 
   /// Empty user which represents an unauthenticated user.
-  static final empty = AuthenticatedUser(id: '');
+  static final empty = MinChatUser(id: '');
 
   /// Convenience getter to determine whether the current user is empty.
-  bool get isEmpty => this == AuthenticatedUser.empty;
+  bool get isEmpty => this == MinChatUser.empty;
 
   /// Convenience getter to determine whether the current user is not empty.
-  bool get isNotEmpty => this != AuthenticatedUser.empty;
+  bool get isNotEmpty => this != MinChatUser.empty;
 
   @override
   List<Object?> get props => [id, name, email, mID, imageUrl];

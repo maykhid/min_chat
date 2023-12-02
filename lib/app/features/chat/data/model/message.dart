@@ -1,30 +1,27 @@
 class Message {
   const Message({
-    required this.senderMId,
-    required this.recipientMId,
+    required this.senderId,
+    required this.recipientId,
     required this.message,
-    required this.timestamp,
+    this.timestamp,
   });
 
-  factory Message.fromMap(Map<String, dynamic> doc) {
-    return Message(
-      senderMId: doc['senderMId'] as String,
-      recipientMId: doc['recipientMId'] as String,
-      message: doc['message'] as String,
-      timestamp: doc['timestamp'] as int,
-    );
-  }
-  final String senderMId;
-  final String recipientMId;
-  final String message;
-  final int timestamp;
+  factory Message.fromMap(Map<String, dynamic> doc) => Message(
+        senderId: doc['senderId'] as String,
+        recipientId: doc['recipientId'] as String,
+        message: doc['message'] as String,
+        timestamp: doc['timestamp'] as int,
+      );
 
-  Map<String, dynamic> toMap() {
-    return {
-      'senderMId': senderMId,
-      'recipientMId': recipientMId,
-      'message': message,
-      'timestamp': timestamp,
-    };
-  }
+  final String senderId;
+  final String recipientId;
+  final String message;
+  final int? timestamp;
+
+  Map<String, dynamic> toMap() => {
+        'senderId': senderId,
+        'recipientId': recipientId,
+        'message': message,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
 }

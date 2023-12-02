@@ -15,6 +15,5 @@ abstract class RegisterModule {
 
   // @singleton
   @preResolve
-  Future<Box<AuthenticatedUser>> get userBox =>
-      Hive.openBox<AuthenticatedUser>('userBox');
+  Future<Box<MinChatUser>> get userBox => Hive.openBox<MinChatUser>('userBox');
 }

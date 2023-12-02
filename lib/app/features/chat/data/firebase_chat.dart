@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/utils/string_x.dart';
 
@@ -13,9 +14,9 @@ class FirebaseChat implements IChat {
   final FirebaseFirestore _firebaseFirestore;
 
   @override
-  Future<AuthenticatedUser> startConversation({
+  Future<MinChatUser> startConversation({
     required String recipientMIdOrEmail,
-    required String senderMId,
+    required MinChatUser currentUser,
   }) async {
     try {
       late final QuerySnapshot<Map<String, dynamic>> userDocument;
@@ -41,15 +42,21 @@ class FirebaseChat implements IChat {
       if (userDocument.docs.isNotEmpty) {
         final recipient = userDocument.docs.first.data();
 
-        final docId = '${recipient['mID']}$senderMId';
+        final docId = '${recipient['id']}${currentUser.id}';
 
         final conversationDocument =
             _firebaseFirestore.collection('conversations').doc(docId);
 
+        final recipientUser = MinChatUser.fromMap(recipient);
+
+        // might add other necessary info later
         await conversationDocument.set({
-          'participants': [recipient['mID'], senderMId],
+          'participants': [recipientUser.toMap(), currentUser.toMap()],
+          'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
+          'initiatedBy': currentUser.id,
+          'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
         });
-        return AuthenticatedUser.fromMap(recipient);
+        return MinChatUser.fromMap(recipient);
       } else {
         throw Exception('User not found!');
       }
@@ -61,15 +68,65 @@ class FirebaseChat implements IChat {
   @override
   Future<void> sendMessage({required Message message}) async {
     try {
-      final docId = '${message.recipientMId}${message.senderMId}';
+      final docId = '${message.recipientId}${message.senderId}';
       final conversationDocument =
           _firebaseFirestore.collection('conversations').doc(docId);
 
-      final messageDocument = conversationDocument.collection('messages').doc();
+      final messageCollection = conversationDocument.collection('messages');
 
-      await messageDocument.set(message.toMap());
+      await messageCollection.add(message.toMap());
+
+      // update lastUpdatedAt field
+      await conversationDocument
+          .update({'lastUpdatedAt': FieldValue.serverTimestamp()});
     } catch (e) {
       throw Exception(e);
     }
   }
+
+  @override
+  Stream<List<Message>> messageStream({
+    required String recipientId,
+    required String senderId,
+  }) =>
+      _firebaseFirestore
+          .collection('conversations')
+          .doc('$recipientId$senderId')
+          .collection('messages')
+          .orderBy('timestamp')
+          .snapshots()
+          .map(
+            (snapshot) => snapshot.docs
+                .map((doc) => Message.fromMap(doc.data()))
+                .toList(),
+          );
+
+  @override
+  Stream<List<Conversation>> conversationStream({required String userId}) =>
+      _firebaseFirestore
+          .collection('conversations')
+          .where(
+            'participants',
+            arrayContains: {'id': userId},
+          )
+          .orderBy('lastUpdatedAt', descending: true)
+          .snapshots()
+          .map(
+            (querySnapshot) => querySnapshot.docs
+                .map((doc) => Conversation.fromMap(doc.data()))
+                .toList(),
+          );
+
+  // _firebaseFirestore
+  //     .collection('conversations')
+  //     .where('participants', arrayContains: ['//currentUser'])
+  //     .snapshots()
+  //     .map(
+  //       (snapshot) => snapshot.docs.map(
+  //         (doc) {
+  //           final data = doc.data();
+  //           return MinChatUser.fromMap(data);
+  //         },
+  //       ).toList(),
+  //     );
 }

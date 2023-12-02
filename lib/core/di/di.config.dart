@@ -16,14 +16,17 @@ import 'package:injectable/injectable.dart' as _i2;
 import 'package:min_chat/app/features/auth/data/authentication_interface.dart'
     as _i7;
 import 'package:min_chat/app/features/auth/data/authentication_repository.dart'
-    as _i11;
+    as _i13;
 import 'package:min_chat/app/features/auth/data/firebase_authentication.dart'
     as _i8;
-import 'package:min_chat/app/features/auth/data/hive_user_dao.dart' as _i10;
+import 'package:min_chat/app/features/auth/data/hive_user_dao.dart' as _i12;
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart'
     as _i4;
-import 'package:min_chat/app/features/auth/data/user_dao.dart' as _i9;
-import 'package:min_chat/core/di/module.dart' as _i12;
+import 'package:min_chat/app/features/auth/data/user_dao.dart' as _i11;
+import 'package:min_chat/app/features/chat/data/chat_interface.dart' as _i9;
+import 'package:min_chat/app/features/chat/data/chat_repository.dart' as _i14;
+import 'package:min_chat/app/features/chat/data/firebase_chat.dart' as _i10;
+import 'package:min_chat/core/di/module.dart' as _i15;
 
 extension GetItInjectableX on _i1.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -37,7 +40,7 @@ extension GetItInjectableX on _i1.GetIt {
       environmentFilter,
     );
     final registerModule = _$RegisterModule();
-    await gh.factoryAsync<_i3.Box<_i4.AuthenticatedUser>>(
+    await gh.factoryAsync<_i3.Box<_i4.MinChatUser>>(
       () => registerModule.userBox,
       preResolve: true,
     );
@@ -47,14 +50,20 @@ extension GetItInjectableX on _i1.GetIt {
       firebaseAuth: gh<_i5.FirebaseAuth>(),
       firebaseFirestore: gh<_i6.FirebaseFirestore>(),
     ));
-    gh.singleton<_i9.UserDao>(
-        _i10.HiveUserDao(userBox: gh<_i3.Box<_i4.AuthenticatedUser>>()));
-    gh.singleton<_i11.AuthenticationRepository>(_i11.AuthenticationRepository(
+    gh.singleton<_i9.IChat>(
+        _i10.FirebaseChat(firebaseFirestore: gh<_i6.FirebaseFirestore>()));
+    gh.singleton<_i11.UserDao>(
+        _i12.HiveUserDao(userBox: gh<_i3.Box<_i4.MinChatUser>>()));
+    gh.singleton<_i13.AuthenticationRepository>(_i13.AuthenticationRepository(
       authenticationInterface: gh<_i7.IAuthentication>(),
-      userDao: gh<_i9.UserDao>(),
+      userDao: gh<_i11.UserDao>(),
+    ));
+    gh.singleton<_i14.ChatRepository>(_i14.ChatRepository(
+      chatInterface: gh<_i9.IChat>(),
+      userDao: gh<_i11.UserDao>(),
     ));
     return this;
   }
 }
 
-class _$RegisterModule extends _i12.RegisterModule {}
+class _$RegisterModule extends _i15.RegisterModule {}

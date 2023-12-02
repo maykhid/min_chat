@@ -1,6 +1,8 @@
 import 'package:injectable/injectable.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
+import 'package:min_chat/app/features/auth/data/user_dao.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/data/model/result.dart';
 
@@ -8,18 +10,21 @@ import 'package:min_chat/core/data/model/result.dart';
 class ChatRepository {
   ChatRepository({
     required IChat chatInterface,
-  }) : _chatInterface = chatInterface;
+    required UserDao userDao,
+  })  : _chatInterface = chatInterface,
+        _userDao = userDao;
 
   final IChat _chatInterface;
+  final UserDao _userDao;
 
-  Future<Result<AuthenticatedUser>> startConversation({
+  Future<Result<MinChatUser>> startConversation({
     required String recipientMIdOrEmail,
     required String senderMId,
   }) async {
     try {
       final response = await _chatInterface.startConversation(
         recipientMIdOrEmail: recipientMIdOrEmail,
-        senderMId: senderMId,
+        currentUser: _userDao.readUser(),
       );
       return Result.success(response);
     } catch (e) {
@@ -39,4 +44,7 @@ class ChatRepository {
       return Result.failure(errorMessage: e.toString());
     }
   }
+
+  Stream<List<Conversation>> allUserConversations({required String userId}) =>
+      _chatInterface.conversationStream(userId: userId);
 }
