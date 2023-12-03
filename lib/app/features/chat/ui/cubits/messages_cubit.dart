@@ -22,6 +22,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 
   void updateConversation(List<Conversation> conversations) {
+    // print(conversations);
     // final currentState = state;
     // final updatedConversations = currentState.conversations
     //   ..addAll(conversations);

@@ -51,6 +51,7 @@ class FirebaseChat implements IChat {
 
         // might add other necessary info later
         await conversationDocument.set({
+          'participantsIds': [recipientUser.id, currentUser.id],
           'participants': [recipientUser.toMap(), currentUser.toMap()],
           'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
           'initiatedBy': currentUser.id,
@@ -106,8 +107,8 @@ class FirebaseChat implements IChat {
       _firebaseFirestore
           .collection('conversations')
           .where(
-            'participants',
-            arrayContains: {'id': userId},
+            'participantsIds',
+            arrayContains: userId,
           )
           .orderBy('lastUpdatedAt', descending: true)
           .snapshots()
@@ -116,17 +117,4 @@ class FirebaseChat implements IChat {
                 .map((doc) => Conversation.fromMap(doc.data()))
                 .toList(),
           );
-
-  // _firebaseFirestore
-  //     .collection('conversations')
-  //     .where('participants', arrayContains: ['//currentUser'])
-  //     .snapshots()
-  //     .map(
-  //       (snapshot) => snapshot.docs.map(
-  //         (doc) {
-  //           final data = doc.data();
-  //           return MinChatUser.fromMap(data);
-  //         },
-  //       ).toList(),
-  //     );
 }

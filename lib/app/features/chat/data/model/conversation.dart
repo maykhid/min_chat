@@ -11,9 +11,11 @@ class Conversation extends Equatable {
 
   factory Conversation.fromMap(Map<String, dynamic> data) {
     // final data = doc.data()! as Map<String, dynamic>;
-    final participantsData = data['participants'] as List<Map<String, dynamic>>;
+    final participantsData = data['participants'] as List<dynamic>;
 
-    final participants = participantsData.map(MinChatUser.fromMap).toList();
+    final participants = participantsData
+        .map((e) => MinChatUser.fromMap(e as Map<String, dynamic>))
+        .toList();
 
     return Conversation(
       initiatedAt:

@@ -7,8 +7,12 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
+import 'package:min_chat/app/shared/ui/app_button.dart';
+import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/app/shared/ui/fading_widget.dart';
+import 'package:min_chat/core/utils/data_response.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -28,7 +32,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         child: const FaIcon(FontAwesomeIcons.penToSquare),
-        onPressed: () {},
+        onPressed: () => _showStartConversationModal(context),
       ),
       body: BlocProvider<MessagesCubit>(
         create: (context) =>
@@ -74,15 +78,13 @@ class MessagesScreenView extends StatelessWidget {
           ),
           Expanded(
             child: BlocBuilder<MessagesCubit, MessagesState>(
-              // bi: (context, state) {
-              //   // TODO: implement listener
-              // },
               builder: (context, state) {
                 final hasData = state.conversations.isNotEmpty;
+                // final hasData = [].isNotEmpty;
 
-                  if (!hasData) {
-                    return const _AwaitingOrder();
-                  }
+                if (!hasData) {
+                  return const _AwaitingOrder();
+                }
 
                 return ListView.builder(
                   padding: EdgeInsets.zero,
@@ -175,4 +177,65 @@ class MessagesListItem extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showStartConversationModal(BuildContext context) {
+  final user = context.read<AuthenticationCubit>().user;
+  AppDialog.showAppDialog(
+    context,
+    BlocProvider<StartConversationCubit>(
+      create: (context) => StartConversationCubit(),
+      child: SizedBox(
+        height: 140,
+        width: context.width * 0.9,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const Text(
+                'Enter user MID or Email to start chatting',
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              CupertinoSearchTextField(
+                borderRadius: BorderRadius.circular(8),
+                prefixIcon: const SizedBox.shrink(),
+                placeholder: 'MID or Email',
+                backgroundColor: Colors.grey.shade100,
+                // borderRadius: BorderRadius.circular(10),
+              ),
+              BlocConsumer<StartConversationCubit, StartConversationState>(
+                listener: (context, state) {
+                  if (state.status.isSuccess) {
+                    print('created conversation');
+                  } else if (state.status.isError) {
+                  } else {}
+                },
+                builder: (context, state) {
+                  final cubit = context.read<StartConversationCubit>();
+
+                  return AppIconButton(
+                    text: 'OK',
+                    icon: const SizedBox.shrink(),
+                    height: 15,
+                    width: 120,
+                    borderRadius: 8,
+                    color: Colors.black,
+                    onPressed: () {
+                      cubit.startConversation(
+                        recipientMIdOrEmail: 'macliquemaykhid@gmail.com',
+                        senderMid: user.mID!,
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
