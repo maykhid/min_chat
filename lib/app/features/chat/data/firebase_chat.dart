@@ -42,7 +42,7 @@ class FirebaseChat implements IChat {
       if (userDocument.docs.isNotEmpty) {
         final recipient = userDocument.docs.first.data();
 
-        final docId = '${recipient['id']}${currentUser.id}';
+        final docId = '${recipient['id']}${currentUser.id}'.sortChars();
 
         final conversationDocument =
             _firebaseFirestore.collection('conversations').doc(docId);
@@ -69,7 +69,7 @@ class FirebaseChat implements IChat {
   @override
   Future<void> sendMessage({required Message message}) async {
     try {
-      final docId = '${message.recipientId}${message.senderId}';
+      final docId = '${message.recipientId}${message.senderId}'.sortChars();
       final conversationDocument =
           _firebaseFirestore.collection('conversations').doc(docId);
 
@@ -92,7 +92,7 @@ class FirebaseChat implements IChat {
   }) =>
       _firebaseFirestore
           .collection('conversations')
-          .doc('$recipientId$senderId')
+          .doc('$recipientId$senderId'.sortChars())
           .collection('messages')
           .orderBy('timestamp')
           .snapshots()
@@ -113,8 +113,10 @@ class FirebaseChat implements IChat {
           .orderBy('lastUpdatedAt', descending: true)
           .snapshots()
           .map(
-            (querySnapshot) => querySnapshot.docs
-                .map((doc) => Conversation.fromMap(doc.data()))
-                .toList(),
+            (querySnapshot) => querySnapshot.docs.map((doc) {
+              // print(doc.data());
+              // print(querySnapshot.docs);
+              return Conversation.fromMap(doc.data());
+            }).toList(),
           );
 }

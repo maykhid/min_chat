@@ -16,4 +16,9 @@ extension StringX on String {
 
     return emailRegex.hasMatch(this);
   }
+
+  String sortChars() {
+    final charList = split('')..sort();
+    return charList.join();
+  }
 }
