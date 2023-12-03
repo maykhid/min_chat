@@ -211,15 +211,17 @@ void _showStartConversationModal(BuildContext context) {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               const Text(
-                'Enter user MID or Email to start chatting',
+                'Enter user mID or Email to start chatting',
                 style: TextStyle(
                   color: Colors.black,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               CupertinoSearchTextField(
                 borderRadius: BorderRadius.circular(8),
                 prefixIcon: const SizedBox.shrink(),
-                placeholder: 'MID or Email',
+                placeholder: 'mID or Email',
+                
                 backgroundColor: Colors.grey.shade100,
                 // borderRadius: BorderRadius.circular(10),
               ),
@@ -242,7 +244,7 @@ void _showStartConversationModal(BuildContext context) {
                     color: Colors.black,
                     onPressed: () {
                       cubit.startConversation(
-                        recipientMIdOrEmail: 'macliquemaykhid@gmail.com',
+                        recipientMIdOrEmail: 'henryifebunandu@gmail.com',
                         senderMid: user.mID!,
                       );
                     },

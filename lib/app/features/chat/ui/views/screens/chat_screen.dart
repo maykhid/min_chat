@@ -94,6 +94,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
           ),
           body: const SizedBox.expand(
             child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: Column(
