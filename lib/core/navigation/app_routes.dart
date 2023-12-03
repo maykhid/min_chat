@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/auth_screen.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
@@ -27,7 +28,12 @@ class AppRoutes {
 
     GoRoute(
       path: Chats.name,
-      builder: (context, state) => const Chats(),
+      builder: (context, state) {
+        final minChatUser = state.extra! as MinChatUser;
+        return Chats(
+          minChatUser: minChatUser,
+        );
+      },
     ),
   ];
 }

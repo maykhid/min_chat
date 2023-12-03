@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 
 class Chats extends StatefulWidget {
-  const Chats({super.key});
+  const Chats({required this.minChatUser, super.key});
 
   static const String name = '/chats';
+
+  final MinChatUser minChatUser;
 
   @override
   State<Chats> createState() => _ChatsState();
@@ -16,11 +19,13 @@ class Chats extends StatefulWidget {
 
 class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   double _bottomOffset = 50;
+  late MinChatUser _minChatUser;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _minChatUser = widget.minChatUser;
   }
 
   @override
@@ -67,16 +72,17 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       const SizedBox(
                         width: 16,
                       ),
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 16,
+                        backgroundImage: NetworkImage(_minChatUser.imageUrl!),
                       ),
                       const SizedBox(
                         width: 8,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
                         child: Text(
-                          'Sandra Achus',
+                          _minChatUser.name!,
                           // style: AppTextStyles.normalTextStyleDark,
                         ),
                       ),
@@ -118,49 +124,49 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ClipRect(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(
-                          sigmaX: 3,
-                          sigmaY: 3,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                // controller: TextEditingController(),
-                                maxLines: null,
-                                enabled: true,
-                                // expands: true,
-                                textAlignVertical: TextAlignVertical.center,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  // fillColor: AppColors.lightGrey3,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    borderSide: const BorderSide(
-                                      width: 0,
-                                      color: Colors.transparent,
-                                      style: BorderStyle.none,
-                                    ),
-                                  ),
-                                  hintText: 'new message',
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 3,
+                      sigmaY: 3,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            // controller: TextEditingController(),
+                            maxLines: null,
+                            enabled: true,
+                            // expands: true,
+                            textAlignVertical: TextAlignVertical.center,
+                            decoration: InputDecoration(
+                              filled: true,
+                              // fillColor: AppColors.lightGrey3,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: const BorderSide(
+                                  width: 0,
+                                  color: Colors.transparent,
+                                  style: BorderStyle.none,
                                 ),
                               ),
+                              hintText: 'new message',
                             ),
-                            const Gap(12),
-                            const FaIcon(FontAwesomeIcons.paperPlane),
-                          ],
+                          ),
                         ),
-                      ),
+                        const Gap(12),
+                        const FaIcon(FontAwesomeIcons.paperPlane),
+                      ],
                     ),
+                  ),
+                ),
               ),
             ),
           ),

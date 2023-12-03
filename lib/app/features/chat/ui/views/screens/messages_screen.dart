@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
@@ -13,6 +14,8 @@ import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/app/shared/ui/fading_widget.dart';
 import 'package:min_chat/core/utils/data_response.dart';
+import 'package:min_chat/core/utils/datetime_x.dart';
+import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -91,7 +94,9 @@ class MessagesScreenView extends StatelessWidget {
                   itemCount: state.conversations.length,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    return const MessagesListItem();
+                    return MessagesListItem(
+                      conversation: state.conversations[index],
+                    );
                   },
                 );
               },
@@ -125,14 +130,21 @@ class _AwaitingOrder extends StatelessWidget {
 
 class MessagesListItem extends StatelessWidget {
   const MessagesListItem({
+    required this.conversation,
     super.key,
   });
 
+  final Conversation conversation;
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.read<AuthenticationCubit>().user;
+    final conversationUser = conversation.participants
+        .extrapolateParticipantByCurrentUserId(currentUser.id);
+
     const border = BorderSide(width: 0.3, color: Colors.grey);
     return InkWell(
-      onTap: () => context.push(Chats.name),
+      onTap: () => context.push(Chats.name, extra: conversationUser),
       child: Container(
         height: 72,
         width: context.width,
@@ -143,11 +155,15 @@ class MessagesListItem extends StatelessWidget {
         decoration: const BoxDecoration(
           border: Border(top: border, bottom: border),
         ),
-        child: const Row(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(child: CircleAvatar()),
-            SizedBox(
+            Center(
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(conversationUser.imageUrl!),
+              ),
+            ),
+            const SizedBox(
               width: 9,
             ),
             Column(
@@ -155,20 +171,21 @@ class MessagesListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Sandra Achus',
+                  conversationUser.name!,
                   // style: AppTextStyles.normalTextStyleDarkGrey2,
                 ),
-                Text(
+                const Text(
                   'Hello sir, how are you?',
                   // style: AppTextStyles.smallTextStyleGrey,
                 ),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             Padding(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: Text(
-                '16:03',
+                conversation.lastUpdatedAt.format,
+                style: const TextStyle(fontSize: 12),
                 // style: AppTextStyles.smallTextStyleGrey,
               ),
             ),
