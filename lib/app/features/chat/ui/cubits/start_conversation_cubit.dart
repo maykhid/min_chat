@@ -16,6 +16,7 @@ class StartConversationCubit extends Cubit<StartConversationState> {
     required String recipientMIdOrEmail,
     required String senderMid,
   }) async {
+    emit(const StartConversationState.processing());
     final response = await _chatRepository.startConversation(
       recipientMIdOrEmail: recipientMIdOrEmail,
       senderMId: senderMid,

@@ -21,4 +21,12 @@ extension StringX on String {
     final charList = split('')..sort();
     return charList.join();
   }
+
+  bool get isValidMid {
+    // Define a regular expression for the desired format
+    final regex = RegExp(r'^\d{6,7}[A-Z]{2}$');
+
+    // Use the regular expression to check the format
+    return regex.hasMatch(this);
+  }
 }

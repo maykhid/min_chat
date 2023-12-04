@@ -10,6 +10,7 @@ class AppIconButton extends StatelessWidget {
     this.width,
     this.height,
     this.borderRadius,
+    this.isLoading = false,
     super.key,
   });
 
@@ -19,6 +20,7 @@ class AppIconButton extends StatelessWidget {
   final double? height;
   final double? borderRadius;
   final Widget icon;
+  final bool isLoading;
   final void Function() onPressed;
 
   @override
@@ -26,7 +28,14 @@ class AppIconButton extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: icon,
-      label: Text(text, style: GoogleFonts.lato(fontSize: 15),),
+      label: isLoading
+          ? const CircularProgressIndicator.adaptive(
+              backgroundColor: Colors.white,
+            )
+          : Text(
+              text,
+              style: GoogleFonts.lato(fontSize: 15),
+            ),
       style: ElevatedButton.styleFrom(
         fixedSize: Size(width ?? 240, height ?? 50),
         shape: RoundedRectangleBorder(

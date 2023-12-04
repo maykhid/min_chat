@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:form_validator/form_validator.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,11 +13,13 @@ import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.da
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
+import 'package:min_chat/app/shared/ui/app_text_field.dart';
 import 'package:min_chat/app/shared/ui/fading_widget.dart';
 import 'package:min_chat/core/utils/data_response.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
+import 'package:min_chat/core/utils/validator_builder_x.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -198,60 +201,96 @@ class MessagesListItem extends StatelessWidget {
 
 void _showStartConversationModal(BuildContext context) {
   final user = context.read<AuthenticationCubit>().user;
+
+  final validator = ValidationBuilder()
+      .or(
+        (builder) => builder.mId().maxLength(9).build(),
+        (builder) => builder.email().maxLength(31).build(),
+        reverse: true,
+      )
+      .build();
+
+  final formKey = GlobalKey<FormState>();
+  final controller = TextEditingController();
+
+  late String midOrEmail;
+
+  void handleStartConversation(StartConversationCubit cubit) {
+    final isValid = formKey.currentState!.validate();
+    if (isValid) {
+      formKey.currentState!.save();
+      cubit.startConversation(
+        recipientMIdOrEmail: midOrEmail,
+        senderMid: user.mID!,
+      );
+    }
+  }
+
   AppDialog.showAppDialog(
     context,
     BlocProvider<StartConversationCubit>(
       create: (context) => StartConversationCubit(),
-      child: SizedBox(
-        height: 140,
-        width: context.width * 0.9,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              const Text(
-                'Enter user mID or Email to start chatting',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              CupertinoSearchTextField(
-                borderRadius: BorderRadius.circular(8),
-                prefixIcon: const SizedBox.shrink(),
-                placeholder: 'mID or Email',
-                
-                backgroundColor: Colors.grey.shade100,
-                // borderRadius: BorderRadius.circular(10),
-              ),
-              BlocConsumer<StartConversationCubit, StartConversationState>(
-                listener: (context, state) {
-                  if (state.status.isSuccess) {
-                    print('created conversation');
-                  } else if (state.status.isError) {
-                  } else {}
-                },
-                builder: (context, state) {
-                  final cubit = context.read<StartConversationCubit>();
-
-                  return AppIconButton(
-                    text: 'OK',
-                    icon: const SizedBox.shrink(),
-                    height: 15,
-                    width: 120,
-                    borderRadius: 8,
+      child: Form(
+        key: formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: SizedBox(
+          height: 190,
+          width: context.width * 0.9,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                const Text(
+                  'Enter user mID or Email to start chatting',
+                  style: TextStyle(
                     color: Colors.black,
-                    onPressed: () {
-                      cubit.startConversation(
-                        recipientMIdOrEmail: 'henryifebunandu@gmail.com',
-                        senderMid: user.mID!,
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                // CupertinoSearchTextField(
+                //   borderRadius: BorderRadius.circular(8),
+                //   prefixIcon: const SizedBox.shrink(),
+                //   placeholder: 'mID or Email',
+
+                //   backgroundColor: Colors.grey.shade100,
+                //   // borderRadius: BorderRadius.circular(10),
+                // ),
+                SizedBox(
+                  height: 70,
+                  child: AppTextField(
+                    controller: controller,
+                    validate: validator,
+                    borderRadius: 10,
+                    onSaved: (value) => midOrEmail = value!,
+                  ),
+                ),
+
+                BlocConsumer<StartConversationCubit, StartConversationState>(
+                  listener: (context, state) {
+                    if (state.status.isSuccess) {
+                      print('created conversation');
+                    } else if (state.status.isError) {
+                      print('failed');
+                    } else {}
+                  },
+                  builder: (context, state) {
+                    final cubit = context.read<StartConversationCubit>();
+
+                    return AppIconButton(
+                      text: 'OK',
+                      icon: const SizedBox.shrink(),
+                      height: 15,
+                      width: 120,
+                      borderRadius: 8,
+                      color: Colors.black,
+                      isLoading: state.status.isProcessing,
+                      onPressed: () => handleStartConversation(cubit),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
