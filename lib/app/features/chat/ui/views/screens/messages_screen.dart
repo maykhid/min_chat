@@ -20,6 +20,7 @@ import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 import 'package:min_chat/core/utils/validator_builder_x.dart';
+import 'package:toastification/toastification.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -269,10 +270,17 @@ void _showStartConversationModal(BuildContext context) {
                 BlocConsumer<StartConversationCubit, StartConversationState>(
                   listener: (context, state) {
                     if (state.status.isSuccess) {
-                      print('created conversation');
+                      context
+                        ..pop() // remove dialog
+                        ..push(Chats.name, extra: state.response);
                     } else if (state.status.isError) {
-                      print('failed');
-                    } else {}
+                      toastification.show(
+                        context: context,
+                        title: state.message!,
+                        type: ToastificationType.error,
+                        autoCloseDuration: const Duration(seconds: 3),
+                      );
+                    }
                   },
                   builder: (context, state) {
                     final cubit = context.read<StartConversationCubit>();

@@ -110,13 +110,17 @@ class FirebaseChat implements IChat {
             'participantsIds',
             arrayContains: userId,
           )
-          .orderBy('lastUpdatedAt', descending: true)
+          // .orderBy('lastUpdatedAt', descending: true)
           .snapshots()
           .map(
-            (querySnapshot) => querySnapshot.docs.map((doc) {
-              // print(doc.data());
-              // print(querySnapshot.docs);
-              return Conversation.fromMap(doc.data());
-            }).toList(),
+            (querySnapshot) => querySnapshot.docs
+                .map(
+                  (doc)
+                      // print(doc.data());
+                      // print(querySnapshot.docs);
+                      =>
+                      Conversation.fromMap(doc.data()),
+                )
+                .toList(),
           );
 }
