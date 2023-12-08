@@ -79,7 +79,7 @@ class FirebaseChat implements IChat {
 
       // update lastUpdatedAt field
       await conversationDocument
-          .update({'lastUpdatedAt': FieldValue.serverTimestamp()});
+          .update({'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch});
     } catch (e) {
       throw Exception(e);
     }
@@ -110,16 +110,12 @@ class FirebaseChat implements IChat {
             'participantsIds',
             arrayContains: userId,
           )
-          // .orderBy('lastUpdatedAt', descending: true)
+          .orderBy('lastUpdatedAt', descending: true)
           .snapshots()
           .map(
             (querySnapshot) => querySnapshot.docs
                 .map(
-                  (doc)
-                      // print(doc.data());
-                      // print(querySnapshot.docs);
-                      =>
-                      Conversation.fromMap(doc.data()),
+                  (doc) => Conversation.fromMap(doc.data()),
                 )
                 .toList(),
           );

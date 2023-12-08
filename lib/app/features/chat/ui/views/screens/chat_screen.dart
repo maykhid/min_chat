@@ -9,42 +9,27 @@ import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 
 class Chats extends StatefulWidget {
-  const Chats({required this.minChatUser, super.key});
+  const Chats({required this.recipientUser, super.key});
 
   static const String name = '/chats';
 
-  final MinChatUser minChatUser;
+  final MinChatUser recipientUser;
 
   @override
   State<Chats> createState() => _ChatsState();
 }
 
 class _ChatsState extends State<Chats> with WidgetsBindingObserver {
-  late MinChatUser _minChatUser;
-
-  List<Message> messages = [
-    const Message(
-      senderId: '45678',
-      recipientId: '345678',
-      message: 'Come here',
-    ),
-    const Message(senderId: '345678', recipientId: '45678', message: 'go here'),
-    const Message(
-      senderId: '45678',
-      recipientId: '345678',
-      message: 'stay here',
-    ),
-    const Message(senderId: '345678', recipientId: '45678', message: 'go home'),
-  ];
+  late MinChatUser _recipientUser;
 
   @override
   void initState() {
     super.initState();
-    _minChatUser = widget.minChatUser;
+    _recipientUser = widget.recipientUser;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +59,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       ),
                       CircleAvatar(
                         radius: 16,
-                        backgroundImage: NetworkImage(_minChatUser.imageUrl!),
+                        backgroundImage: NetworkImage(_recipientUser.imageUrl!),
                       ),
                       const SizedBox(
                         width: 8,
@@ -82,7 +67,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Text(
-                          _minChatUser.name!,
+                          _recipientUser.name!,
                           // style: AppTextStyles.normalTextStyleDark,
                         ),
                       ),
@@ -95,15 +80,20 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
           body: BlocProvider<ChatCubit>(
             create: (context) => ChatCubit()
               ..initMessageListener(
-                recipientId: _minChatUser.id,
+                recipientId: _recipientUser.id,
                 senderId: cubit.user.id,
               ),
-            child: ChatsView(messages: messages),
+            child: const ChatsView(),
           ),
         ),
 
         // messageing text box
-        const _MessagingTextBox(),
+        BlocProvider<SendMessageCubit>(
+          create: (context) => SendMessageCubit(),
+          child: _MessagingTextBox(
+            recipientId: _recipientUser.id,
+          ),
+        ),
       ],
     );
   }
@@ -111,35 +101,40 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
 
 class ChatsView extends StatelessWidget {
   const ChatsView({
-    required this.messages,
     super.key,
   });
 
-  final List<Message> messages;
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: SizedBox.expand(
-        child: ListView.builder(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            if (messages[index].senderId == '45678') {
-              return const Padding(
-                padding: EdgeInsets.only(top: 32),
-                child: SenderChatBubble(),
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.only(top: 32),
-                child: RecipientChatBubble(),
-              );
-            }
-          },
-        ),
-      ),
+    // final chats = context.read<ChatCubit>().state.chats;
+    final currentUser = context.read<AuthenticationCubit>().user;
+
+    return BlocBuilder<ChatCubit, ChatState>(
+      builder: (context, state) {
+        final chats = state.chats;
+        return Padding(
+          padding: const EdgeInsets.symmetric( horizontal: 16),
+          child: SizedBox.expand(
+            child: ListView.builder(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                if (chats[index].senderId == currentUser.id) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 32),
+                    child: SenderChatBubble(),
+                  );
+                } else {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 32),
+                    child: RecipientChatBubble(),
+                  );
+                }
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -241,9 +236,10 @@ class SenderChatBubble extends StatelessWidget {
   }
 }
 
-
 class _MessagingTextBox extends StatefulWidget {
-  const _MessagingTextBox();
+  const _MessagingTextBox({required this.recipientId});
+
+  final String recipientId;
 
   @override
   State<_MessagingTextBox> createState() => _MessagingTextBoxState();
@@ -252,9 +248,13 @@ class _MessagingTextBox extends StatefulWidget {
 class _MessagingTextBoxState extends State<_MessagingTextBox>
     with WidgetsBindingObserver {
   double _bottomOffset = 50;
+  late String _recipientId;
+
+  final controller = TextEditingController();
 
   @override
   void initState() {
+    _recipientId = widget.recipientId;
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -280,6 +280,10 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
 
   @override
   Widget build(BuildContext context) {
+
+    final sendMessageCubit = context.read<SendMessageCubit>();
+    final currentUser = context.read<AuthenticationCubit>().user;
+
     return Align(
       alignment: Alignment.bottomCenter,
       child: AnimatedContainer(
@@ -300,6 +304,8 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: controller,
+                        // onChanged: (text) => message = text,
                         // controller: TextEditingController(),
                         maxLines: null,
                         enabled: true,
@@ -329,7 +335,16 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
                       ),
                     ),
                     const Gap(12),
-                    const FaIcon(FontAwesomeIcons.paperPlane),
+                    InkWell(
+                      onTap: () => sendMessageCubit.sendMessage(
+                        message: Message(
+                          senderId: currentUser.id,
+                          recipientId: _recipientId,
+                          message: controller.text,
+                        ),
+                      ),
+                      child: const FaIcon(FontAwesomeIcons.paperPlane),
+                    ),
                   ],
                 ),
               ),

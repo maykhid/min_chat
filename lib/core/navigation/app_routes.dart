@@ -31,7 +31,7 @@ class AppRoutes {
       builder: (context, state) {
         final minChatUser = state.extra! as MinChatUser;
         return Chats(
-          minChatUser: minChatUser,
+          recipientUser: minChatUser,
         );
       },
     ),
