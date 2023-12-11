@@ -11,6 +11,7 @@ import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
+import 'package:min_chat/core/utils/sized_context.dart';
 
 class Chats extends StatefulWidget {
   const Chats({required this.recipientUser, super.key});
@@ -100,10 +101,61 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   }
 }
 
-class ChatsView extends StatelessWidget {
+class ChatsView extends StatefulWidget {
   const ChatsView({
     super.key,
   });
+
+  @override
+  State<ChatsView> createState() => _ChatsViewState();
+}
+
+class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
+  final controller = ScrollController();
+
+  static const double customScrollExtent = 250;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setNewScrollExtent();
+    });
+  }
+
+  void setNewScrollExtent({double? scrollExtent}) {
+    if (controller.position.atEdge) {
+      controller.animateTo(
+        controller.position.maxScrollExtent +
+            (scrollExtent ??= customScrollExtent),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+    }
+  }
+
+  @override
+  void didChangeMetrics() {
+    if (mounted) {
+      incrementScrollExtentOnShowKeyboard();
+    }
+
+    super.didChangeMetrics();
+  }
+
+  void incrementScrollExtentOnShowKeyboard() {
+    final keyboardHeight = WidgetsBinding
+        .instance.platformDispatcher.views.first.viewInsets.bottom;
+    setState(() {
+      // trigger reposition/reset of scrollExtent on keyboard hide
+      if (keyboardHeight < 50) {
+        setNewScrollExtent(scrollExtent: customScrollExtent);
+      } else {
+        setNewScrollExtent(scrollExtent: context.height * 0.45);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +169,8 @@ class ChatsView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: SizedBox.expand(
             child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 150),
+              controller: controller,
+              padding: const EdgeInsets.only(bottom: 150, top: 30),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               itemCount: chats.length,
               itemBuilder: (context, index) {
@@ -188,7 +241,6 @@ class RecipientChatBubble extends StatelessWidget {
             const SizedBox(
               height: 6,
             ),
-            
           ],
         ),
       ),
@@ -280,13 +332,19 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
 
   @override
   void didChangeMetrics() {
+    moveTextBoxPositionOnKeyboardShow();
+    super.didChangeMetrics();
+  }
+
+  void moveTextBoxPositionOnKeyboardShow() {
     final keyboardHeight = WidgetsBinding
         .instance.platformDispatcher.views.first.viewInsets.bottom;
     setState(() {
-      _bottomOffset = keyboardHeight * 0.35;
       // prevent textfield from reaching the bottom on keyboard hide
       if (keyboardHeight < 50) {
         _bottomOffset = 50;
+      } else {
+        _bottomOffset = context.height * 0.42;
       }
     });
   }
