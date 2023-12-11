@@ -181,20 +181,20 @@ class MessagesListItem extends StatelessWidget {
                   conversationUser.name!,
                   // style: AppTextStyles.normalTextStyleDarkGrey2,
                 ),
-                Text(
-                  hasLastMessage
-                      ? conversation.lastMessage!
-                      : 'Start a conversation',
-                  style: hasLastMessage
-                      ? const TextStyle(
-                          fontSize: 11,
-                          fontStyle: FontStyle.italic,
-                        )
-                      : const TextStyle(
-                          fontSize: 11,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey,
-                        ),
+                SizedBox(
+                  width: context.width * 0.65,
+                  child: Text(
+                    hasLastMessage
+                        ? conversation.lastMessage!
+                        : 'Start a conversation',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.black54,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),
@@ -263,14 +263,7 @@ void _showStartConversationModal(BuildContext context) {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                // CupertinoSearchTextField(
-                //   borderRadius: BorderRadius.circular(8),
-                //   prefixIcon: const SizedBox.shrink(),
-                //   placeholder: 'mID or Email',
-
-                //   backgroundColor: Colors.grey.shade100,
-                //   // borderRadius: BorderRadius.circular(10),
-                // ),
+              
                 SizedBox(
                   height: 70,
                   child: AppTextField(

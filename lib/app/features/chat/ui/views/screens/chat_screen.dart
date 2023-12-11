@@ -112,7 +112,7 @@ class ChatsView extends StatelessWidget {
     return BlocBuilder<ChatCubit, ChatState>(
       builder: (context, state) {
         final chats = state.chats;
-        
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: SizedBox.expand(
@@ -123,14 +123,14 @@ class ChatsView extends StatelessWidget {
               itemBuilder: (context, index) {
                 if (chats[index].senderId == currentUser.id) {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(top: 2),
                     child: SenderChatBubble(
                       message: chats[index],
                     ),
                   );
                 } else {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(top: 2),
                     child: RecipientChatBubble(message: chats[index]),
                   );
                 }
@@ -169,26 +169,26 @@ class RecipientChatBubble extends StatelessWidget {
                   bottomStart: Radius.circular(8),
                 ),
               ),
-              child: SizedBox(
-                // width: 200,
-                child: Text(
-                  message.message,
-                  style: const TextStyle(color: Colors.black),
-                  textWidthBasis: TextWidthBasis.longestLine,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.message,
+                    style: const TextStyle(color: Colors.black),
+                    textWidthBasis: TextWidthBasis.longestLine,
+                  ),
+                  Text(
+                    DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
+                        .formatToTime,
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                ],
               ),
             ),
             const SizedBox(
               height: 6,
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
-                    .formatToTime,
-                style: const TextStyle(fontSize: 11),
-              ),
-            ),
+            
           ],
         ),
       ),
@@ -224,25 +224,24 @@ class SenderChatBubble extends StatelessWidget {
                 bottomStart: Radius.circular(8),
               ),
             ),
-            child: SizedBox(
-              // width: 200,
-              child: Text(
-                message.message,
-                style: const TextStyle(color: Colors.white),
-                textWidthBasis: TextWidthBasis.longestLine,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  message.message,
+                  style: const TextStyle(color: Colors.white),
+                  textWidthBasis: TextWidthBasis.longestLine,
+                ),
+                Text(
+                  DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
+                      .formatToTime,
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+              ],
             ),
           ),
           const SizedBox(
             height: 6,
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
-                  .formatToTime,
-              style: const TextStyle(fontSize: 11),
-            ),
           ),
         ],
       ),
