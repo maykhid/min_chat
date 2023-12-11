@@ -147,6 +147,9 @@ class MessagesListItem extends StatelessWidget {
         .extrapolateParticipantByCurrentUserId(currentUser.id);
 
     const border = BorderSide(width: 0.3, color: Colors.grey);
+
+    final hasLastMessage = conversation.lastMessage != null;
+
     return InkWell(
       onTap: () => context.push(Chats.name, extra: conversationUser),
       child: Container(
@@ -178,9 +181,20 @@ class MessagesListItem extends StatelessWidget {
                   conversationUser.name!,
                   // style: AppTextStyles.normalTextStyleDarkGrey2,
                 ),
-                const Text(
-                  'Hello sir, how are you?',
-                  // style: AppTextStyles.smallTextStyleGrey,
+                Text(
+                  hasLastMessage
+                      ? conversation.lastMessage!
+                      : 'Start a conversation',
+                  style: hasLastMessage
+                      ? const TextStyle(
+                          fontSize: 11,
+                          fontStyle: FontStyle.italic,
+                        )
+                      : const TextStyle(
+                          fontSize: 11,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey,
+                        ),
                 ),
               ],
             ),

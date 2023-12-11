@@ -10,6 +10,7 @@ import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
+import 'package:min_chat/core/utils/datetime_x.dart';
 
 class Chats extends StatefulWidget {
   const Chats({required this.recipientUser, super.key});
@@ -106,28 +107,31 @@ class ChatsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final chats = context.read<ChatCubit>().state.chats;
     final currentUser = context.read<AuthenticationCubit>().user;
 
     return BlocBuilder<ChatCubit, ChatState>(
       builder: (context, state) {
         final chats = state.chats;
+        
         return Padding(
-          padding: const EdgeInsets.symmetric( horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: SizedBox.expand(
             child: ListView.builder(
+              padding: const EdgeInsets.only(bottom: 150),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               itemCount: chats.length,
               itemBuilder: (context, index) {
                 if (chats[index].senderId == currentUser.id) {
-                  return const Padding(
-                    padding: EdgeInsets.only(top: 32),
-                    child: SenderChatBubble(),
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: SenderChatBubble(
+                      message: chats[index],
+                    ),
                   );
                 } else {
-                  return const Padding(
-                    padding: EdgeInsets.only(top: 32),
-                    child: RecipientChatBubble(),
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: RecipientChatBubble(message: chats[index]),
                   );
                 }
               },
@@ -141,8 +145,11 @@ class ChatsView extends StatelessWidget {
 
 class RecipientChatBubble extends StatelessWidget {
   const RecipientChatBubble({
+    required this.message,
     super.key,
   });
+
+  final Message message;
 
   @override
   Widget build(BuildContext context) {
@@ -155,18 +162,18 @@ class RecipientChatBubble extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
               decoration: const BoxDecoration(
-                color: Colors.black87,
+                color: Colors.black12,
                 borderRadius: BorderRadiusDirectional.only(
                   topEnd: Radius.circular(8),
                   bottomEnd: Radius.circular(8),
                   bottomStart: Radius.circular(8),
                 ),
               ),
-              child: const SizedBox(
+              child: SizedBox(
                 // width: 200,
                 child: Text(
-                  '''Yes ma, I would. ''',
-                  style: TextStyle(color: Colors.white),
+                  message.message,
+                  style: const TextStyle(color: Colors.black),
                   textWidthBasis: TextWidthBasis.longestLine,
                 ),
               ),
@@ -174,11 +181,12 @@ class RecipientChatBubble extends StatelessWidget {
             const SizedBox(
               height: 6,
             ),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '16:03',
-                // style: AppTextStyles.smallTextStylePrimary,
+                DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
+                    .formatToTime,
+                style: const TextStyle(fontSize: 11),
               ),
             ),
           ],
@@ -190,8 +198,11 @@ class RecipientChatBubble extends StatelessWidget {
 
 class SenderChatBubble extends StatelessWidget {
   const SenderChatBubble({
+    required this.message,
     super.key,
   });
+
+  final Message message;
 
   @override
   Widget build(BuildContext context) {
@@ -205,17 +216,19 @@ class SenderChatBubble extends StatelessWidget {
             // width: 200,
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
             decoration: const BoxDecoration(
-              color: Colors.black12,
+              // color: Colors.black12,
+              color: Colors.black87,
               borderRadius: BorderRadiusDirectional.only(
                 topStart: Radius.circular(8),
                 bottomEnd: Radius.circular(8),
                 bottomStart: Radius.circular(8),
               ),
             ),
-            child: const SizedBox(
+            child: SizedBox(
               // width: 200,
               child: Text(
-                '''Hello Ayo, I was expecting you around to fix the broken pipe. I was expecting you around to fix the broken pipe.''',
+                message.message,
+                style: const TextStyle(color: Colors.white),
                 textWidthBasis: TextWidthBasis.longestLine,
               ),
             ),
@@ -223,11 +236,12 @@ class SenderChatBubble extends StatelessWidget {
           const SizedBox(
             height: 6,
           ),
-          const Align(
+          Align(
             alignment: Alignment.centerRight,
             child: Text(
-              '16:03',
-              // style: AppTextStyles.smallTextStylePrimary,
+              DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
+                  .formatToTime,
+              style: const TextStyle(fontSize: 11),
             ),
           ),
         ],
@@ -280,9 +294,21 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
 
   @override
   Widget build(BuildContext context) {
-
     final sendMessageCubit = context.read<SendMessageCubit>();
     final currentUser = context.read<AuthenticationCubit>().user;
+
+    void sendMessage() {
+      if (controller.text.isNotEmpty) {
+        sendMessageCubit.sendMessage(
+          message: Message(
+            senderId: currentUser.id,
+            recipientId: _recipientId,
+            message: controller.text,
+          ),
+        );
+        controller.clear();
+      }
+    }
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -336,13 +362,7 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
                     ),
                     const Gap(12),
                     InkWell(
-                      onTap: () => sendMessageCubit.sendMessage(
-                        message: Message(
-                          senderId: currentUser.id,
-                          recipientId: _recipientId,
-                          message: controller.text,
-                        ),
-                      ),
+                      onTap: sendMessage,
                       child: const FaIcon(FontAwesomeIcons.paperPlane),
                     ),
                   ],

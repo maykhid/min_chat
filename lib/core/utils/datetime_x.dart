@@ -1,11 +1,12 @@
 extension DateTimeFormatting on DateTime {
-  String get format  {
+  String get format {
     final now = DateTime.now();
     final difference = now.difference(this);
 
     if (difference.inDays == 0) {
       // If time is today, show the exact time
-      return '$hour:${minute.toString().padLeft(2, '0')}';
+      return formatToTime;
+      // return '$hour:${minute.toString().padLeft(2, '0')}';
     } else if (difference.inDays == 1) {
       // If time is yesterday, show "Yesterday"
       return 'Yesterday';
@@ -17,6 +18,8 @@ extension DateTimeFormatting on DateTime {
       return '$day/$month/$year';
     }
   }
+
+  String get formatToTime => '$hour:${minute.toString().padLeft(2, '0')}';
 
   String _getDayOfWeek(int day) {
     switch (day) {

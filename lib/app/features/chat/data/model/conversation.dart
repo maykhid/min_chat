@@ -7,6 +7,7 @@ class Conversation extends Equatable {
     required this.initiatedBy,
     required this.initiatedAt,
     required this.lastUpdatedAt,
+    this.lastMessage,
   });
 
   factory Conversation.fromMap(Map<String, dynamic> data) {
@@ -24,6 +25,7 @@ class Conversation extends Equatable {
       participants: participants,
       lastUpdatedAt:
           DateTime.fromMillisecondsSinceEpoch(data['lastUpdatedAt'] as int),
+      lastMessage: data['lastMessage'] as String?,
     );
   }
 
@@ -31,6 +33,7 @@ class Conversation extends Equatable {
   final String initiatedBy;
   final DateTime initiatedAt;
   final DateTime lastUpdatedAt;
+  final String? lastMessage;
 
   Map<String, dynamic> toMap() {
     return {
@@ -38,6 +41,7 @@ class Conversation extends Equatable {
       'initiatedBy': initiatedBy,
       'participants': participants.map((user) => user.toMap()).toList(),
       'lastUpdatedAt': lastUpdatedAt,
+      'lastMessage': lastMessage,
     };
   }
 

@@ -56,6 +56,7 @@ class FirebaseChat implements IChat {
           'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
           'initiatedBy': currentUser.id,
           'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
+          'lastMessage': null,
         });
         return MinChatUser.fromMap(recipient);
       } else {
@@ -78,8 +79,10 @@ class FirebaseChat implements IChat {
       await messageCollection.add(message.toMap());
 
       // update lastUpdatedAt field
-      await conversationDocument
-          .update({'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch});
+      await conversationDocument.update({
+        'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
+        'lastMessage': message.message,
+      });
     } catch (e) {
       throw Exception(e);
     }
