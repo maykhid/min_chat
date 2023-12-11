@@ -344,7 +344,7 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
       if (keyboardHeight < 50) {
         _bottomOffset = 50;
       } else {
-        _bottomOffset = context.height * 0.42;
+        _bottomOffset = context.height * 0.4;
       }
     });
   }
