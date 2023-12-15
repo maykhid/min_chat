@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // ignore: must_be_immutable
 class AppTextField extends StatelessWidget {
   AppTextField({
-    this.controller,
+    required this.controller,
     super.key,
     this.hintText,
     this.prefixIcon,
@@ -20,11 +20,13 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.errorText,
     this.borderRadius,
+    this.focusNode,
   });
   final String? hintText;
   final String? labelText;
   final Widget? prefixIcon;
-  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final TextEditingController controller;
   final int? maxLines;
   final Widget? suffixIcon;
   final bool obscureText;
@@ -45,6 +47,7 @@ class AppTextField extends StatelessWidget {
       validator: validate,
       maxLines: obscureText == true ? 1 : maxLines,
       keyboardType: textInputType,
+      focusNode: focusNode,
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w500,

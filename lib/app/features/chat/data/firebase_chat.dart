@@ -21,6 +21,11 @@ class FirebaseChat implements IChat {
     try {
       late final QuerySnapshot<Map<String, dynamic>> userDocument;
 
+      if (currentUser.mID == recipientMIdOrEmail ||
+          currentUser.email == recipientMIdOrEmail) {
+        throw Exception('You cannot chat with yourself.');
+      }
+
       if (recipientMIdOrEmail.isEmail) {
         userDocument = await _firebaseFirestore
             .collection('users')

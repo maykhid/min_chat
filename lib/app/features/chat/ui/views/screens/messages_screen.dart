@@ -227,6 +227,7 @@ void _showStartConversationModal(BuildContext context) {
 
   final formKey = GlobalKey<FormState>();
   final controller = TextEditingController();
+  final focusNode = FocusNode();
 
   late String midOrEmail;
 
@@ -234,6 +235,7 @@ void _showStartConversationModal(BuildContext context) {
     final isValid = formKey.currentState!.validate();
     if (isValid) {
       formKey.currentState!.save();
+      focusNode.unfocus();
       cubit.startConversation(
         recipientMIdOrEmail: midOrEmail,
         senderMid: user.mID!,
@@ -263,17 +265,16 @@ void _showStartConversationModal(BuildContext context) {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              
                 SizedBox(
                   height: 70,
                   child: AppTextField(
                     controller: controller,
+                    focusNode: focusNode,
                     validate: validator,
                     borderRadius: 10,
                     onSaved: (value) => midOrEmail = value!,
                   ),
                 ),
-
                 BlocConsumer<StartConversationCubit, StartConversationState>(
                   listener: (context, state) {
                     if (state.status.isSuccess) {
