@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
@@ -19,6 +20,7 @@ import 'package:min_chat/core/utils/data_response.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
+import 'package:min_chat/core/utils/string_x.dart';
 import 'package:min_chat/core/utils/validator_builder_x.dart';
 import 'package:toastification/toastification.dart';
 
@@ -150,6 +152,14 @@ class MessagesListItem extends StatelessWidget {
 
     final hasLastMessage = conversation.lastMessage != null;
 
+    String senderName() {
+      if (hasLastMessage &&
+          conversation.lastMessage!.isFromCurrentUser(currentUser.id)) {
+        return 'You';
+      }
+      return conversationUser.name!.firstword;
+    }
+
     return InkWell(
       onTap: () => context.push(Chats.name, extra: conversationUser),
       child: Container(
@@ -185,10 +195,11 @@ class MessagesListItem extends StatelessWidget {
                   width: context.width * 0.65,
                   child: Text(
                     hasLastMessage
-                        ? conversation.lastMessage!
+                        ? '''${senderName()}: ${conversation.lastMessage!.message}'''
                         : 'Start a conversation',
                     style: const TextStyle(
                       fontSize: 11,
+                      fontWeight: FontWeight.w700,
                       fontStyle: FontStyle.italic,
                       color: Colors.black54,
                       overflow: TextOverflow.ellipsis,
@@ -200,7 +211,7 @@ class MessagesListItem extends StatelessWidget {
             ),
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.only(top: 8),
               child: Text(
                 conversation.lastUpdatedAt.format,
                 style: const TextStyle(fontSize: 12),

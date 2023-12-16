@@ -86,7 +86,7 @@ class FirebaseChat implements IChat {
       // update lastUpdatedAt field
       await conversationDocument.update({
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
-        'lastMessage': message.message,
+        'lastMessage': message.toMap(),
       });
     } catch (e) {
       throw Exception(e);

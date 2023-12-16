@@ -25,3 +25,7 @@ class Message {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
       };
 }
+
+extension MessageX on Message {
+  bool isFromCurrentUser(String currentUserId) => senderId == currentUserId;
+}

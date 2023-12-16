@@ -176,14 +176,14 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
               itemBuilder: (context, index) {
                 if (chats[index].senderId == currentUser.id) {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsets.only(top: 5),
                     child: SenderChatBubble(
                       message: chats[index],
                     ),
                   );
                 } else {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsets.only(top: 5),
                     child: RecipientChatBubble(message: chats[index]),
                   );
                 }
@@ -238,9 +238,7 @@ class RecipientChatBubble extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 6,
-            ),
+            
           ],
         ),
       ),
@@ -292,9 +290,7 @@ class SenderChatBubble extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(
-            height: 6,
-          ),
+          
         ],
       ),
     );
