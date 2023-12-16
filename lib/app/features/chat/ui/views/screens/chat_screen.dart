@@ -174,6 +174,22 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               itemCount: chats.length,
               itemBuilder: (context, index) {
+
+                // check chat day and display
+                if (index == 0 ||
+                    chats[index].timestamp!.day !=
+                        chats[index - 1].timestamp!.day) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: ChatTimePill(
+                        time: chats[index].timestamp!.formatDescriptive,
+                      ),
+                    ),
+                  );
+                }
+
+                // show sender bubble
                 if (chats[index].senderId == currentUser.id) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 5),
@@ -181,7 +197,10 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
                       message: chats[index],
                     ),
                   );
-                } else {
+                } 
+                
+                // show recipient bubble
+                else {
                   return Padding(
                     padding: const EdgeInsets.only(top: 5),
                     child: RecipientChatBubble(message: chats[index]),
@@ -192,6 +211,36 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
           ),
         );
       },
+    );
+  }
+}
+
+class ChatTimePill extends StatelessWidget {
+  const ChatTimePill({
+    required this.time,
+    super.key,
+  });
+
+  final String time;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: 5,
+        horizontal: 10,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.shade300,
+        borderRadius: const BorderRadiusDirectional.all(
+          Radius.circular(5),
+        ),
+      ),
+      child: Text(
+        time,
+        style: const TextStyle(fontSize: 12, color: Colors.white),
+        // style: AppTextStyles.smallTextStyleGrey,
+      ),
     );
   }
 }
@@ -231,14 +280,12 @@ class RecipientChatBubble extends StatelessWidget {
                     textWidthBasis: TextWidthBasis.longestLine,
                   ),
                   Text(
-                    DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
-                        .formatToTime,
+                    message.timestamp!.formatToTime,
                     style: const TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ],
               ),
             ),
-            
           ],
         ),
       ),
@@ -283,14 +330,12 @@ class SenderChatBubble extends StatelessWidget {
                   textWidthBasis: TextWidthBasis.longestLine,
                 ),
                 Text(
-                  DateTime.fromMillisecondsSinceEpoch(message.timestamp!)
-                      .formatToTime,
+                  message.timestamp!.formatToTime,
                   style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
               ],
             ),
           ),
-          
         ],
       ),
     );
