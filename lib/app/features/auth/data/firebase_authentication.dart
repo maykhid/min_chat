@@ -34,7 +34,7 @@ class FirebaseAuthentication implements IAuthentication {
   }
 
   @override
-  Future<AuthenticatedUser> signInWithGoogle() async {
+  Future<MinChatUser> signInWithGoogle() async {
     try {
       final googleUser = await GoogleSignIn().signIn();
 
@@ -51,9 +51,9 @@ class FirebaseAuthentication implements IAuthentication {
       if (userCredential.additionalUserInfo!.isNewUser) {
         // TODO(maykhid): check that mID has not been previously assigned to a user
 
-        final mID = generateMID();
+        final mID = generateMID;
 
-        final authenticatedUser = AuthenticatedUser(
+        final authenticatedUser = MinChatUser(
           id: _user?.uid ?? '',
           name: _user?.displayName,
           email: _user?.email,
@@ -72,7 +72,7 @@ class FirebaseAuthentication implements IAuthentication {
         final snapshot =
             await _firebaseFirestore.collection('users').doc(_user?.uid).get();
         final userMap = snapshot.data();
-        return AuthenticatedUser.fromMap(userMap!);
+        return MinChatUser.fromMap(userMap!);
       }
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
@@ -84,7 +84,5 @@ class FirebaseAuthentication implements IAuthentication {
   // @override
   // AuthenticatedUser get user => _authenticatedUser;
 
-  String generateMID() {
-    return '${generatePrefixForID()}${generateSuffixForID(2)}';
-  }
+  String get generateMID => '${generatePrefixForID()}${generateSuffixForID(2)}';
 }

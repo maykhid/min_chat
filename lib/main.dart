@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:min_chat/app/app.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
+
 import 'package:min_chat/core/di/di.dart';
 import 'package:min_chat/firebase_options.dart';
 import 'package:path/path.dart';
@@ -22,7 +22,7 @@ setup() async {
   final dbPath = join(dir.path, '.db.hive');
   await Hive.initFlutter(dbPath);
 
-  Hive.registerAdapter(AuthenticatedUserAdapter());
+  Hive.registerAdapter(MinChatUserAdapter());
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initDependencies();

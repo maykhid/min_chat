@@ -15,7 +15,7 @@ class AuthenticationRepository {
   final IAuthentication _authenticationInterface;
   final UserDao _userDao;
 
-  AuthenticatedUser get user => _userDao.readUser();
+  MinChatUser get user => _userDao.readUser();
 
   Future<Result<void>> signInWithGithub() async {
     try {

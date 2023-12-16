@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/sign_in_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/views/screens/messages_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/core/utils/data_response.dart';
@@ -43,9 +44,9 @@ class AuthView extends StatelessWidget {
             autoCloseDuration: const Duration(seconds: 3),
           );
         } else if (state.status.isSuccess) {
-          // context
-          //   ..pop() // remove load dialog
-          //   ..pushReplacement(OrderDetailScreen.name);
+          context
+            ..pop() // remove load dialog
+            ..pushReplacement(MessagesScreen.name);
         } else {
           AppDialog.showAppDialog(
             context,
@@ -70,14 +71,14 @@ class AuthView extends StatelessWidget {
                 style: GoogleFonts.aDLaMDisplay(
                   fontSize: 40,
                   fontWeight: FontWeight.normal,
-                  color: Colors.pinkAccent,
+                  color: Colors.black,
                 ),
               ),
               const Gap(8),
               const FaIcon(
                 FontAwesomeIcons.message,
                 size: 40,
-                color: Colors.pinkAccent,
+                color: Colors.black,
               ),
             ],
           ),
@@ -85,7 +86,7 @@ class AuthView extends StatelessWidget {
           const Text(
             'Continue with',
             style: TextStyle(
-              color: Colors.pinkAccent,
+              color: Colors.black,
             ),
           ),
           const Gap(20),

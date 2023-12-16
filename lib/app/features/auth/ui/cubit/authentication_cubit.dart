@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:min_chat/app/features/auth/data/authentication_repository.dart';
@@ -26,7 +25,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     }
   }
 
-  AuthenticatedUser get user => _authenticationRepository.user;
+  MinChatUser get user => _authenticationRepository.user;
 }
 
 enum AuthenticationStatus {

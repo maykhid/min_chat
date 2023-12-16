@@ -6,22 +6,22 @@ import 'package:min_chat/app/features/auth/data/user_dao.dart';
 @Singleton(as: UserDao)
 class HiveUserDao implements UserDao {
   HiveUserDao({
-    required Box<AuthenticatedUser> userBox,
+    required Box<MinChatUser> userBox,
   }) : _userBox = userBox;
 
-  final Box<AuthenticatedUser> _userBox;
+  final Box<MinChatUser> _userBox;
 
   static const String key = '__user__key__';
 
   @override
-  AuthenticatedUser readUser() {
+  MinChatUser readUser() {
     if (_userBox.isEmpty) {
-      return AuthenticatedUser.empty;
+      return MinChatUser.empty;
     }
     return _userBox.get(key)!;
   }
 
   @override
-  void writeUser(AuthenticatedUser authenticatedUser) =>
+  void writeUser(MinChatUser authenticatedUser) =>
       _userBox.put(key, authenticatedUser);
 }
