@@ -3,7 +3,7 @@ extension DateTimeFormatting on DateTime {
     final now = DateTime.now();
     final difference = now.difference(this);
 
-    if (difference.inDays == 0) {
+    if (difference.inHours == 0) {
       // If time is today, show the exact time
       return formatToTime;
       // return '$hour:${minute.toString().padLeft(2, '0')}';
@@ -23,7 +23,7 @@ extension DateTimeFormatting on DateTime {
     final now = DateTime.now();
     final difference = now.difference(this);
 
-    if (difference.inDays == 0) {
+    if (difference.inHours == 0) {
       // If time is today, show the exact time
       return 'Today';
       // return '$hour:${minute.toString().padLeft(2, '0')}';

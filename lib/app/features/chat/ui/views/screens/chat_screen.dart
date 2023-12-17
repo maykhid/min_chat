@@ -175,30 +175,58 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
               itemCount: chats.length,
               itemBuilder: (context, index) {
 
-                // check chat day and display
-                if (index == 0 ||
-                    chats[index].timestamp!.day !=
-                        chats[index - 1].timestamp!.day) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Center(
-                      child: ChatTimePill(
-                        time: chats[index].timestamp!.formatDescriptive,
+                ///? (Logic to show chat time on different days)
+                /// 
+                /// show message and time:     
+                /// if message[index] is first message
+                /// or message[index] timestamp.day is not the same with 
+                /// message[index - 1] timestamp.day (previous day)
+                /// 
+                /// else:
+                /// display other messages 
+                final showtime = index == 0 ||
+                    (chats[index].timestamp!.day !=
+                        chats[index - 1].timestamp!.day);
+
+                /// [isSentByUser] message was sent by our current user
+                final isSentByUser = chats[index].senderId == currentUser.id;
+                
+                if (showtime) {
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: ChatTimePill(
+                          time: chats[index].timestamp!.formatDescriptive,
+                        ),
                       ),
-                    ),
+                      if (isSentByUser) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: SenderChatBubble(
+                            message: chats[index],
+                          ),
+                        ),
+                      ] else ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: RecipientChatBubble(message: chats[index]),
+                        ),
+                      ],
+                    ],
                   );
                 }
 
                 // show sender bubble
-                if (chats[index].senderId == currentUser.id) {
+                if (isSentByUser) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 5),
                     child: SenderChatBubble(
                       message: chats[index],
                     ),
                   );
-                } 
-                
+                }
+
                 // show recipient bubble
                 else {
                   return Padding(
@@ -368,6 +396,7 @@ class _MessagingTextBoxState extends State<_MessagingTextBox>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    controller.dispose();
     super.dispose();
   }
 
