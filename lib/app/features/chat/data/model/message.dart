@@ -10,13 +10,13 @@ class Message {
         senderId: doc['senderId'] as String,
         recipientId: doc['recipientId'] as String,
         message: doc['message'] as String,
-        timestamp: doc['timestamp'] as int,
+        timestamp: DateTime.fromMillisecondsSinceEpoch(doc['timestamp'] as int),
       );
 
   final String senderId;
   final String recipientId;
   final String message;
-  final int? timestamp;
+  final DateTime? timestamp;
 
   Map<String, dynamic> toMap() => {
         'senderId': senderId,
