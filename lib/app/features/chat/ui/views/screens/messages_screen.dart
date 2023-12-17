@@ -226,8 +226,26 @@ class MessagesListItem extends StatelessWidget {
 }
 
 void _showStartConversationModal(BuildContext context) {
-  final user = context.read<AuthenticationCubit>().user;
+  AppDialog.showAppDialog(
+    context,
+    const StartConversationWidget(),
+  );
+}
 
+class StartConversationWidget extends StatefulWidget {
+  const StartConversationWidget({
+    super.key,
+  });
+
+  @override
+  State<StartConversationWidget> createState() =>
+      _StartConversationWidgetState();
+}
+
+class _StartConversationWidgetState extends State<StartConversationWidget> {
+  final formKey = GlobalKey<FormState>();
+  final controller = TextEditingController();
+  final focusNode = FocusNode();
   final validator = ValidationBuilder()
       .or(
         (builder) => builder.mId().maxLength(9).build(),
@@ -236,27 +254,32 @@ void _showStartConversationModal(BuildContext context) {
       )
       .build();
 
-  final formKey = GlobalKey<FormState>();
-  final controller = TextEditingController();
-  final focusNode = FocusNode();
-
-  late String midOrEmail;
-
-  void handleStartConversation(StartConversationCubit cubit) {
-    final isValid = formKey.currentState!.validate();
-    if (isValid) {
-      formKey.currentState!.save();
-      focusNode.unfocus();
-      cubit.startConversation(
-        recipientMIdOrEmail: midOrEmail,
-        senderMid: user.mID!,
-      );
-    }
+  @override
+  void dispose() {
+    controller.dispose();
+    focusNode.dispose();
+    super.dispose();
   }
 
-  AppDialog.showAppDialog(
-    context,
-    BlocProvider<StartConversationCubit>(
+  @override
+  Widget build(BuildContext context) {
+    final user = context.read<AuthenticationCubit>().user;
+
+    late String midOrEmail;
+
+    void handleStartConversation(StartConversationCubit cubit) {
+      final isValid = formKey.currentState!.validate();
+      if (isValid) {
+        formKey.currentState!.save();
+        focusNode.unfocus();
+        cubit.startConversation(
+          recipientMIdOrEmail: midOrEmail,
+          senderMid: user.mID!,
+        );
+      }
+    }
+
+    return BlocProvider<StartConversationCubit>(
       create: (context) => StartConversationCubit(),
       child: Form(
         key: formKey,
@@ -321,6 +344,6 @@ void _showStartConversationModal(BuildContext context) {
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
