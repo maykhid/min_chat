@@ -3,7 +3,7 @@ extension DateTimeFormatting on DateTime {
     final now = DateTime.now();
     final difference = now.difference(this);
 
-    if (difference.inHours == 0) {
+    if ((difference.inHours / 24).round() == 0) {
       // If time is today, show the exact time
       return formatToTime;
       // return '$hour:${minute.toString().padLeft(2, '0')}';
@@ -23,10 +23,10 @@ extension DateTimeFormatting on DateTime {
     final now = DateTime.now();
     final difference = now.difference(this);
 
-    if (difference.inHours == 0) {
-      // If time is today, show the exact time
+    if ((difference.inHours / 24).round() == 0) {
+      // If time is today, show today
+     
       return 'Today';
-      // return '$hour:${minute.toString().padLeft(2, '0')}';
     } else if (difference.inDays == 1) {
       // If time is yesterday, show "Yesterday"
       return 'Yesterday';
@@ -36,8 +36,10 @@ extension DateTimeFormatting on DateTime {
     } else {
       // Else, show the date
       if (now.year == year) {
-        return '${_getDayOfWeek(weekday)}, $day ${_getMonth(month)} ';
+        // e.g Fri, 20 May
+        return '${_getDayOfWeek(weekday)}, $day ${_getMonth(month)} '; 
       }
+       // e.g 30 May, 1997
       return '$day ${_getMonth(month, isDescriptive: true)}, $year';
     }
   }
