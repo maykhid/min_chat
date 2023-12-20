@@ -7,28 +7,36 @@ import 'package:gap/gap.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/cubits/text_voice_toggler_cubit/text_voice_toggler_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/message_button.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/voice_recorder_box.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
-class MessageInputHandler extends StatefulWidget {
-  const MessageInputHandler({required this.recipientId, super.key});
+class TextVoiceBoxToggler extends StatefulWidget {
+  const TextVoiceBoxToggler({required this.recipientId, super.key});
 
   final String recipientId;
   @override
-  State<MessageInputHandler> createState() => _MessageInputHandlerState();
+  State<TextVoiceBoxToggler> createState() => _TextVoiceBoxTogglerState();
 }
 
-class _MessageInputHandlerState extends State<MessageInputHandler> {
+class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
   @override
   Widget build(BuildContext context) {
-    const isShowing = 5 == 4;
+    return BlocProvider(
+      create: (context) => TextVoiceTogglerCubit(),
+      child: BlocBuilder<TextVoiceTogglerCubit, TextVoiceTogglerState>(
+        builder: (context, state) {
+          final isShowingText = state is TextState;
 
-    if (!isShowing) {
-      return const VoiceRecorderBox();
-    }
-
-    return MessagingTextBox(
-      recipientId: widget.recipientId,
+          if (isShowingText) {
+            return MessagingTextBox(
+              recipientId: widget.recipientId,
+            );
+          }
+          return const VoiceRecorderBox();
+        },
+      ),
     );
   }
 }
@@ -100,6 +108,7 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
   Widget build(BuildContext context) {
     final sendMessageCubit = context.read<SendMessageCubit>();
     final currentUser = context.read<AuthenticationCubit>().user;
+    final textOrVoiceController = context.read<TextVoiceTogglerCubit>();
 
     void sendMessage() {
       if (controller.text.isNotEmpty) {
@@ -132,39 +141,11 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: controller,
-                        // onChanged: (text) => message = text,
-                        // controller: TextEditingController(),
-                        maxLines: null,
-                        enabled: true,
-                        // expands: true,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          filled: true,
-                          // fillColor: AppColors.lightGrey3,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              width: 0,
-                              color: Colors.transparent,
-                              style: BorderStyle.none,
-                            ),
-                          ),
-                          hintText: 'new message',
-                        ),
-                      ),
-                    ),
+                    // text field
+                    _MessageTextField(controller: controller),
+
                     const Gap(12),
+
                     if (showRecordingIcon) ...[
                       MessageButton(
                         onPressed: sendMessage,
@@ -172,7 +153,8 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
                       ),
                     ] else ...[
                       MessageButton(
-                        onPressed: () {},
+                        onPressed: () => print('Tap and hold to record'),
+                        onLongPress: textOrVoiceController.textVoiceToggle,
                         icon: FontAwesomeIcons.microphone,
                       ),
                     ],
@@ -187,92 +169,44 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
   }
 }
 
-class VoiceRecorderBox extends StatefulWidget {
-  const VoiceRecorderBox({super.key});
+class _MessageTextField extends StatelessWidget {
+  const _MessageTextField({
+    required this.controller,
+  });
 
-  @override
-  State<VoiceRecorderBox> createState() => _VoiceRecorderBoxState();
-}
-
-class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
-  bool isRecording = true;
-  bool isPlaying = false;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: AnimatedContainer(
-        margin: const EdgeInsets.only(bottom: 20),
-        duration: const Duration(milliseconds: 100),
-        child: Material(
-          type: MaterialType.transparency,
-          color: Colors.transparent,
-          child: ClipRect(
-            clipBehavior: Clip.antiAlias,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  height: 50,
-                  width: context.width * 0.76,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadiusDirectional.horizontal(
-                      start: Radius.circular(20),
-                      end: Radius.circular(20),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      MessageButton(
-                        onPressed: () {
-                          // close recorder ui
-                        },
-                        icon: FontAwesomeIcons.xmark,
-                      ),
-                      SizedBox(
-                        width: context.width * 0.58,
-                        child: const LinearProgressIndicator(
-                          minHeight: 2,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    MessageButton(
-                      onPressed: () {},
-                      icon: FontAwesomeIcons.arrowUp,
-                    ),
-                    const Gap(8),
-                    MessageButton(
-                      onPressed: () {
-                        // toggle stop/play
-                        if (isRecording) {
-                          setState(() {
-                            isRecording = !isRecording;
-                          });
-                        } else {
-                          setState(() {
-                            isPlaying = !isPlaying;
-                          });
-                        }
-                      },
-                      icon: isRecording
-                          ? Icons.stop_circle
-                          : (isPlaying ? Icons.pause_circle : Icons.play_arrow),
-                    ),
-                  ],
-                ),
-              ],
+    return Expanded(
+      child: TextField(
+        controller: controller,
+        // onChanged: (text) => message = text,
+        // controller: TextEditingController(),
+        maxLines: null,
+        enabled: true,
+        // expands: true,
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          filled: true,
+          // fillColor: AppColors.lightGrey3,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(
+              width: 0,
+              color: Colors.transparent,
+              style: BorderStyle.none,
             ),
           ),
+          hintText: 'new message',
         ),
       ),
     );

@@ -92,7 +92,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
         // messageing text box
         BlocProvider<SendMessageCubit>(
           create: (context) => SendMessageCubit(),
-          child: MessageInputHandler(
+          child: TextVoiceBoxToggler(
             recipientId: _recipientUser.id,
           ),
         ),
