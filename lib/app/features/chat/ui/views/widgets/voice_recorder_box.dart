@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/message.dart';
+import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/text_voice_toggler_cubit/text_voice_toggler_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/voice_note_cubit/voice_note_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/message_button.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
 class VoiceRecorderBox extends StatefulWidget {
-  const VoiceRecorderBox({super.key});
+  const VoiceRecorderBox({
+    required this.recipientId,
+    super.key,
+  });
+
+  final String recipientId;
 
   @override
   State<VoiceRecorderBox> createState() => _VoiceRecorderBoxState();
@@ -23,7 +31,7 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
   @override
   Widget build(BuildContext context) {
     final textOrVoiceController = context.read<TextVoiceTogglerCubit>();
-    
+
     return BlocProvider(
       create: (context) => VoiceNoteCubit(),
       child: Padding(
@@ -53,7 +61,7 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         // close recorder
-                        MessageButton(
+                        CustomCircularIconButton(
                           onPressed: textOrVoiceController.textVoiceToggle,
                           icon: FontAwesomeIcons.xmark,
                         ),
@@ -75,7 +83,9 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
                   const Spacer(),
 
                   // controls
-                  const _RecorderControls(),
+                  _RecorderControls(
+                    recipientId: widget.recipientId,
+                  ),
                 ],
               ),
             ),
@@ -87,7 +97,11 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
 }
 
 class _RecorderControls extends StatefulWidget {
-  const _RecorderControls();
+  const _RecorderControls({
+    required this.recipientId,
+  });
+
+  final String recipientId;
 
   @override
   State<_RecorderControls> createState() => _RecorderControlsState();
@@ -96,51 +110,74 @@ class _RecorderControls extends StatefulWidget {
 class _RecorderControlsState extends State<_RecorderControls> {
   // bool isRecording = false;
   // bool isPlaying = false;
-  late VoiceNoteCubit cubit;
+  late VoiceNoteCubit voiceCubit;
+  late AuthenticationCubit authCubit;
+  late SendMessageCubit sendMessageCubit;
+  late TextVoiceTogglerCubit textVoiceTogglerCubit;
 
   @override
   void initState() {
-    cubit = context.read<VoiceNoteCubit>();
-    cubit.startRecording();
+    voiceCubit = context.read<VoiceNoteCubit>();
+    authCubit = context.read<AuthenticationCubit>();
+    sendMessageCubit = context.read<SendMessageCubit>();
+    textVoiceTogglerCubit = context.read<TextVoiceTogglerCubit>();
+    voiceCubit.startRecording();
     super.initState();
   }
 
   @override
   void dispose() {
-    cubit.dispose();
+    voiceCubit.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<VoiceNoteCubit, VoiceNoteState>(
-      // listener: (context, state) {
-      //   // isRecording = state is RecordingState;
-      //   // isPlaying =
-      // },
       listener: (ctx, state) {},
       builder: (ctx, state) {
-        final voiceCubit = cubit;
         final isRecording = state is RecordingState;
         final isPlaying = state is PlaybackState &&
             state is! PlaybackCompleteState &&
             state is! PlaybackStoppedState;
 
+        final message = Message(
+          senderId: authCubit.user.id,
+          recipientId: widget.recipientId,
+          message: '🎵 Audio',
+          status: pendingStatusFlag,
+          messageType: audioMessageFlag,
+        );
+
         return Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            MessageButton(
-              onPressed: () {},
+            CustomCircularIconButton(
+              onPressed: () {
+                /// stop voice recording before sending
+                /// only if recorder is still recording
+                /// else, just send
+                if (isRecording) {
+                  voiceCubit.stopRecording().then(
+                        (_) => _sendVoiceNote(
+                          message: message,
+                        ),
+                      );
+                } else {
+                  _sendVoiceNote(
+                    message: message,
+                  );
+                }
+              },
               icon: FontAwesomeIcons.arrowUp,
             ),
             const Gap(8),
-            MessageButton(
+            CustomCircularIconButton(
               onPressed: () => isRecording
                   ? voiceCubit.stopRecording()
                   : isPlaying
                       ? voiceCubit.pausePlayback()
                       : voiceCubit.playback(),
-
               icon: isRecording
                   ? Icons.stop_circle
                   : (isPlaying ? Icons.pause_circle : Icons.play_arrow),
@@ -149,6 +186,16 @@ class _RecorderControlsState extends State<_RecorderControls> {
         );
       },
     );
+  }
+
+  void _sendVoiceNote({
+    required Message message,
+  }) {
+    sendMessageCubit.sendVoiceMessage(
+      message: message,
+      filePath: voiceCubit.path!,
+    );
+    textVoiceTogglerCubit.textVoiceToggle();
   }
 }
 

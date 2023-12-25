@@ -4,12 +4,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/chat_time_pill.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/message_text_box.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/recipient_chat_bubble.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/recipient_voice_bubble.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/sender_chat_bubble.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/sender_voice_bubble.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
@@ -134,6 +137,11 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void didChangeMetrics() {
     if (mounted) {
       incrementScrollExtentOnShowKeyboard();
@@ -188,6 +196,9 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                 /// [isSentByUser] message was sent by our current user
                 final isSentByUser = chats[index].senderId == currentUser.id;
 
+                final isText = chats[index].messageType == textMessageFlag ||
+                    chats[index].messageType == null;
+
                 if (showtime) {
                   return Column(
                     children: [
@@ -197,38 +208,48 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                           time: chats[index].timestamp!.formatDescriptive,
                         ),
                       ),
-                      if (isSentByUser) ...[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: SenderChatBubble(
-                            message: chats[index],
-                          ),
+                      if (isSentByUser)
+                        ..._showSenderTextOrAudioMessage(isText, chats, index)
+                      else
+                        ..._showRecipientTextOrAudioMessage(
+                          isText,
+                          chats,
+                          index,
                         ),
-                      ] else ...[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: RecipientChatBubble(message: chats[index]),
-                        ),
-                      ],
                     ],
                   );
                 }
 
-                // show sender bubble
+                // show sender voice or text bubble
                 if (isSentByUser) {
+                  if (isText) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: SenderChatBubble(
+                        message: chats[index],
+                      ),
+                    );
+                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 5),
-                    child: SenderChatBubble(
-                      message: chats[index],
-                    ),
+                    child: SenderVoiceBubble(message: chats[index]),
                   );
                 }
 
-                // show recipient bubble
+                // show recipient voice or text bubble
                 else {
+                  if (isText) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: RecipientChatBubble(message: chats[index]),
+                    );
+                  }
+
                   return Padding(
                     padding: const EdgeInsets.only(top: 5),
-                    child: RecipientChatBubble(message: chats[index]),
+                    child: RecipientVoiceBubble(
+                      message: chats[index],
+                    ),
                   );
                 }
               },
@@ -237,5 +258,49 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
         );
       },
     );
+  }
+
+  List<Widget> _showRecipientTextOrAudioMessage(
+    bool isText,
+    List<Message> chats,
+    int index,
+  ) {
+    return [
+      if (isText) ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: RecipientChatBubble(message: chats[index]),
+        ),
+      ] else ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: RecipientVoiceBubble(
+            message: chats[index],
+          ),
+        ),
+      ],
+    ];
+  }
+
+  List<Widget> _showSenderTextOrAudioMessage(
+    bool isText,
+    List<Message> chats,
+    int index,
+  ) {
+    return [
+      if (isText) ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: SenderChatBubble(
+            message: chats[index],
+          ),
+        ),
+      ] else ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: SenderVoiceBubble(message: chats[index]),
+        ),
+      ],
+    ];
   }
 }

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
@@ -8,10 +11,14 @@ import 'package:min_chat/core/utils/string_x.dart';
 
 @Singleton(as: IChat)
 class FirebaseChat implements IChat {
-  FirebaseChat({required FirebaseFirestore firebaseFirestore})
-      : _firebaseFirestore = firebaseFirestore;
+  FirebaseChat({
+    required FirebaseFirestore firebaseFirestore,
+    required FirebaseStorage firebaseStorage,
+  })  : _firebaseFirestore = firebaseFirestore,
+        _firebaseStorage = firebaseStorage;
 
   final FirebaseFirestore _firebaseFirestore;
+  final FirebaseStorage _firebaseStorage;
 
   @override
   Future<MinChatUser> startConversation({
@@ -81,12 +88,51 @@ class FirebaseChat implements IChat {
 
       final messageCollection = conversationDocument.collection('messages');
 
-      await messageCollection.add(message.toMap());
+      final messageRef = await messageCollection.add(message.toMap());
+
+      // update message status
+      await messageRef.update({
+        'status': sentStatusFlag,
+      });
 
       // update lastUpdatedAt field
       await conversationDocument.update({
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
         'lastMessage': message.toMap(),
+      });
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> sendVoiceMessage({
+    required Message message,
+    required String filePath,
+  }) async {
+    try {
+      final docId = '${message.recipientId}${message.senderId}'.sortChars();
+      final conversationDocument =
+          _firebaseFirestore.collection('conversations').doc(docId);
+
+      final messageCollection = conversationDocument.collection('messages');
+
+      final messageRef = await messageCollection.add(message.toMap());
+      final audioMessageRef = _firebaseStorage
+          .ref()
+          .child('voice-messages/${DateTime.now().millisecondsSinceEpoch}.m4a');
+
+      await conversationDocument.update({
+        'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
+        'lastMessage': message.toMap(),
+      });
+
+      await audioMessageRef.putFile(File(filePath));
+      final url = await audioMessageRef.getDownloadURL();
+
+      await messageRef.update({
+        'url': url,
+        'status': sentStatusFlag,
       });
     } catch (e) {
       throw Exception(e);

@@ -27,14 +27,16 @@ class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
       create: (context) => TextVoiceTogglerCubit(),
       child: BlocBuilder<TextVoiceTogglerCubit, TextVoiceTogglerState>(
         builder: (context, state) {
-          final isShowingText = state is TextState;
+          final isShowingTextBox = state is TextState;
 
-          if (isShowingText) {
+          if (isShowingTextBox) {
             return MessagingTextBox(
               recipientId: widget.recipientId,
             );
           }
-          return const VoiceRecorderBox();
+          return VoiceRecorderBox(
+            recipientId: widget.recipientId,
+          );
         },
       ),
     );
@@ -55,21 +57,21 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
   double _bottomOffset = 50;
   late String _recipientId;
 
-  final controller = TextEditingController();
-  bool showRecordingIcon = false;
+  final _textController = TextEditingController();
+  bool _showRecordingIcon = false;
 
   @override
   void initState() {
     _recipientId = widget.recipientId;
     WidgetsBinding.instance.addObserver(this);
-    controller.addListener(onTextChanged);
+    _textController.addListener(onTextChanged);
     super.initState();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    controller.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -80,13 +82,13 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
   }
 
   void onTextChanged() {
-    if (controller.text.isEmpty) {
+    if (_textController.text.isEmpty) {
       setState(() {
-        showRecordingIcon = false;
+        _showRecordingIcon = false;
       });
     } else {
       setState(() {
-        showRecordingIcon = true;
+        _showRecordingIcon = true;
       });
     }
   }
@@ -111,15 +113,16 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
     final textOrVoiceController = context.read<TextVoiceTogglerCubit>();
 
     void sendMessage() {
-      if (controller.text.isNotEmpty) {
+      if (_textController.text.isNotEmpty) {
         sendMessageCubit.sendMessage(
           message: Message(
             senderId: currentUser.id,
             recipientId: _recipientId,
-            message: controller.text,
+            message: _textController.text,
+            messageType: textMessageFlag,
           ),
         );
-        controller.clear();
+        _textController.clear();
       }
     }
 
@@ -142,17 +145,17 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
                 child: Row(
                   children: [
                     // text field
-                    _MessageTextField(controller: controller),
+                    _MessageTextField(controller: _textController),
 
                     const Gap(12),
 
-                    if (showRecordingIcon) ...[
-                      MessageButton(
+                    if (_showRecordingIcon) ...[
+                      CustomCircularIconButton(
                         onPressed: sendMessage,
                         icon: FontAwesomeIcons.paperPlane,
                       ),
                     ] else ...[
-                      MessageButton(
+                      CustomCircularIconButton(
                         onPressed: () => print('Tap and hold to record'),
                         onLongPress: textOrVoiceController.textVoiceToggle,
                         icon: FontAwesomeIcons.microphone,

@@ -45,6 +45,21 @@ class ChatRepository {
     }
   }
 
+  Future<Result<void>> sendVoiceMessage({
+    required Message message,
+    required String filePath,
+  }) async {
+    try {
+      final response = await _chatInterface.sendVoiceMessage(
+        message: message,
+        filePath: filePath,
+      );
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(errorMessage: e.toString());
+    }
+  }
+
   Stream<List<Message>> messageStream({
     required String recipientId,
     required String senderId,

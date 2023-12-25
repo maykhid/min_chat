@@ -11,6 +11,11 @@ abstract class IChat {
 
   Future<void> sendMessage({required Message message});
 
+  Future<void> sendVoiceMessage({
+    required Message message,
+    required String filePath,
+  });
+
   Stream<List<Message>> messageStream({
     required String recipientId,
     required String senderId,

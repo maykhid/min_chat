@@ -10,6 +10,7 @@ environment:
 
 
 dependencies:
+  audio_video_progress_bar: ^2.0.1
   audioplayers: ^5.2.1
   bloc: ^8.1.2
   cloud_firestore: ^4.13.2
@@ -17,6 +18,7 @@ dependencies:
   equatable: ^2.0.5
   firebase_auth: ^4.13.0
   firebase_core: ^2.22.0
+  firebase_storage: ^11.5.6
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.3
