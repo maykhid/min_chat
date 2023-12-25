@@ -88,17 +88,29 @@ class FirebaseChat implements IChat {
 
       final messageCollection = conversationDocument.collection('messages');
 
-      final messageRef = await messageCollection.add(message.toMap());
+      final messageAsMap = message.toMap()
+        ..addAll({
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'messageType': textMessageFlag,
+          'status': pendingStatusFlag,
+        });
+
+      final messageRef = await messageCollection.add(
+        messageAsMap,
+      );
 
       // update message status
-      await messageRef.update({
-        'status': sentStatusFlag,
-      });
+      await messageRef.update(
+        messageAsMap
+          ..addAll({
+            'status': sentStatusFlag,
+          }),
+      );
 
       // update lastUpdatedAt field
       await conversationDocument.update({
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
-        'lastMessage': message.toMap(),
+        'lastMessage': messageAsMap,
       });
     } catch (e) {
       throw Exception(e);
@@ -117,22 +129,32 @@ class FirebaseChat implements IChat {
 
       final messageCollection = conversationDocument.collection('messages');
 
-      final messageRef = await messageCollection.add(message.toMap());
+      final messageAsMap = message.toMap()
+        ..addAll({
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'messageType': audioMessageFlag,
+          'status': pendingStatusFlag,
+        });
+
+      final messageRef = await messageCollection.add(messageAsMap);
       final audioMessageRef = _firebaseStorage
           .ref()
           .child('voice-messages/${DateTime.now().millisecondsSinceEpoch}.m4a');
 
-      await conversationDocument.update({
-        'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
-        'lastMessage': message.toMap(),
-      });
-
       await audioMessageRef.putFile(File(filePath));
       final url = await audioMessageRef.getDownloadURL();
 
-      await messageRef.update({
-        'url': url,
-        'status': sentStatusFlag,
+      await messageRef.update(
+        messageAsMap
+          ..addAll({
+            'url': url,
+            'status': sentStatusFlag,
+          }),
+      );
+
+      await conversationDocument.update({
+        'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
+        'lastMessage': messageAsMap,
       });
     } catch (e) {
       throw Exception(e);

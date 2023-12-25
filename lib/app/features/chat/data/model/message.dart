@@ -33,10 +33,10 @@ class Message {
         'senderId': senderId,
         'recipientId': recipientId,
         'message': message,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'timestamp': timestamp,
         'messageType': messageType,
-        'status': pendingStatusFlag,
-        'url': null,
+        'status': status,
+        'url': url,
       };
 }
 
