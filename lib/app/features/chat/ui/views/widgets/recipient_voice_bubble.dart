@@ -53,29 +53,39 @@ class _RecipientVoiceBubbleState extends State<RecipientVoiceBubble> {
       if (state == PlayerState.completed) {
         // Audio has completed, reset the playback position to start
         _audioPlayer.seek(Duration.zero);
-        setState(() {
-          _isPlaying = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isPlaying = false;
+          });
+        }
       }
     });
 
     // Listen for changes in audio duration
     _audioPlayer.onDurationChanged.listen((Duration duration) {
-      setState(() {
-        _duration = duration;
-      });
+      if (mounted) {
+        setState(() {
+          _duration = duration;
+        });
+      }
     });
 
     // Listen for changes in audio position
     _audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _position = position;
-      });
+      if (mounted) {
+        setState(() {
+          _position = position;
+        });
+      }
     });
 
-    _audioPlayer.onPlayerComplete.listen((_) {
-      _position = Duration.zero;
-    });
+    // _audioPlayer.onPlayerComplete.listen((_) {
+    //   if (mounted) {
+    //     // setState(() {
+    //       // _duration = Duration.zero;
+    //     // });
+    //   }
+    // });
   }
 
   @override
@@ -105,7 +115,7 @@ class _RecipientVoiceBubbleState extends State<RecipientVoiceBubble> {
       alignment: Alignment.centerLeft,
       child: Container(
         width: 200,
-        height: 75,
+        height: 80,
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
         decoration: _recipientVoiceBoxDecoration,
         child: Column(
@@ -134,6 +144,7 @@ class _RecipientVoiceBubbleState extends State<RecipientVoiceBubble> {
                       thumbColor: Colors.black,
                       thumbRadius: 4,
                       timeLabelType: TimeLabelType.totalTime,
+                      timeLabelLocation: TimeLabelLocation.none,
                       timeLabelTextStyle: const TextStyle(
                         color: Colors.grey,
                       ),

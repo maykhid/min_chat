@@ -11,7 +11,7 @@ abstract class VoiceRecorder {
   Future<Result<void>> stopPlayback();
   Stream<RecordingStatus> get recordingState;
   String? get recordingPath;
-  void disposeResources();
+  Future<void> disposeResources();
 }
 
 enum RecordingStatus {

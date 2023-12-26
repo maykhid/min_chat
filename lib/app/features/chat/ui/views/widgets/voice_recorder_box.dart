@@ -125,9 +125,13 @@ class _RecorderControlsState extends State<_RecorderControls> {
     super.initState();
   }
 
+  Future<void> _dispose() async {
+    await voiceCubit.close();
+  }
+
   @override
   void dispose() {
-    voiceCubit.dispose();
+    _dispose();
     super.dispose();
   }
 
@@ -149,40 +153,51 @@ class _RecorderControlsState extends State<_RecorderControls> {
           messageType: audioMessageFlag,
         );
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            CustomCircularIconButton(
-              onPressed: () {
-                /// stop voice recording before sending
-                /// only if recorder is still recording
-                /// else, just send
-                if (isRecording) {
-                  voiceCubit.stopRecording().then(
-                        (_) => _sendVoiceNote(
-                          message: message,
-                        ),
-                      );
-                } else {
-                  _sendVoiceNote(
-                    message: message,
-                  );
-                }
-              },
-              icon: FontAwesomeIcons.arrowUp,
+        return Container(
+          height: 100,
+          width: 45,
+          decoration: const BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadiusDirectional.horizontal(
+              start: Radius.circular(20),
+              end: Radius.circular(20),
             ),
-            const Gap(8),
-            CustomCircularIconButton(
-              onPressed: () => isRecording
-                  ? voiceCubit.stopRecording()
-                  : isPlaying
-                      ? voiceCubit.pausePlayback()
-                      : voiceCubit.playback(),
-              icon: isRecording
-                  ? Icons.stop_circle
-                  : (isPlaying ? Icons.pause_circle : Icons.play_arrow),
-            ),
-          ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomCircularIconButton(
+                onPressed: () {
+                  /// stop voice recording before sending
+                  /// only if recorder is still recording
+                  /// else, just send
+                  if (isRecording) {
+                    voiceCubit.stopRecording().then(
+                          (_) => _sendVoiceNote(
+                            message: message,
+                          ),
+                        );
+                  } else {
+                    _sendVoiceNote(
+                      message: message,
+                    );
+                  }
+                },
+                icon: FontAwesomeIcons.arrowUp,
+              ),
+              const Gap(8),
+              CustomCircularIconButton(
+                onPressed: () => isRecording
+                    ? voiceCubit.stopRecording()
+                    : isPlaying
+                        ? voiceCubit.pausePlayback()
+                        : voiceCubit.playback(),
+                icon: isRecording
+                    ? Icons.stop_circle
+                    : (isPlaying ? Icons.pause_circle : Icons.play_arrow),
+              ),
+            ],
+          ),
         );
       },
     );

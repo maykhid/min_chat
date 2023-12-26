@@ -51,36 +51,36 @@ class _SenderVoiceBubbleState extends State<SenderVoiceBubble> {
       if (state == PlayerState.completed) {
         // Audio has completed, reset the playback position to start
         _audioPlayer.seek(Duration.zero);
-        setState(() {
-          _isPlaying = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isPlaying = false;
+          });
+        }
       }
     });
 
     // Listen for changes in audio duration
     _audioPlayer.onDurationChanged.listen((Duration duration) {
-      setState(() {
-        _duration = duration;
-      });
+      if (mounted) {
+        setState(() {
+          _duration = duration;
+        });
+      }
     });
 
     // Listen for changes in audio position
     _audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _position = position;
-      });
+      if (mounted) {
+        setState(() {
+          _position = position;
+        });
+      }
     });
 
-    _audioPlayer.onPlayerComplete.listen((_) {
-      // _duration = Duration.zero;
-      _position = Duration.zero;
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    message = widget.message;
-    super.didChangeDependencies();
+    // _audioPlayer.onPlayerComplete.listen((_) {
+    //   // _duration = Duration.zero;
+    //   _position = Duration.zero;
+    // });
   }
 
   @override
@@ -136,6 +136,7 @@ class _SenderVoiceBubbleState extends State<SenderVoiceBubble> {
                       thumbColor: Colors.grey,
                       thumbRadius: 4,
                       timeLabelType: TimeLabelType.totalTime,
+                      timeLabelLocation: TimeLabelLocation.none,
                       timeLabelTextStyle: const TextStyle(color: Colors.white),
                       onSeek: _audioPlayer.seek,
                     ),

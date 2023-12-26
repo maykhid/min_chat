@@ -11,7 +11,6 @@ class VoiceNoteCubit extends Cubit<VoiceNoteState> {
     VoiceRecorder? voiceRecorder,
   })  : _voiceRecorder = voiceRecorder ?? locator<VoiceRecorder>(),
         super(UnknownState()) {
-
     // listener updates
     _voiceRecorder.recordingState.listen((event) {
       if (event == RecordingStatus.playbackComplete) {
@@ -106,11 +105,11 @@ class VoiceNoteCubit extends Cubit<VoiceNoteState> {
     }
   }
 
-  void dispose() => _voiceRecorder.disposeResources();
+  Future<void> dispose() => _voiceRecorder.disposeResources();
 
   @override
-  Future<void> close() {
-    dispose();
+  Future<void> close() async {
+    await dispose();
     return super.close();
   }
 }

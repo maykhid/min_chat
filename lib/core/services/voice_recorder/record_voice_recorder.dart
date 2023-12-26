@@ -146,9 +146,9 @@ class RecordVoiceRecorder implements VoiceRecorder {
   }
 
   @override
-  void disposeResources() {
-    _audioPlayers.dispose();
-    _audioRecorder.dispose();
+  Future<void> disposeResources() async {
+    await _audioPlayers.dispose();
+    await _audioRecorder.dispose();
     _recordingState = RecordingStatus.uninitialized;
     _recordingStateController.add(_recordingState);
   }

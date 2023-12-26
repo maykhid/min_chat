@@ -12,15 +12,10 @@ import 'package:min_chat/app/features/chat/ui/views/widgets/message_button.dart'
 import 'package:min_chat/app/features/chat/ui/views/widgets/voice_recorder_box.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
-class TextVoiceBoxToggler extends StatefulWidget {
+class TextVoiceBoxToggler extends StatelessWidget {
   const TextVoiceBoxToggler({required this.recipientId, super.key});
 
   final String recipientId;
-  @override
-  State<TextVoiceBoxToggler> createState() => _TextVoiceBoxTogglerState();
-}
-
-class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -31,11 +26,14 @@ class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
 
           if (isShowingTextBox) {
             return MessagingTextBox(
-              recipientId: widget.recipientId,
+              recipientId: recipientId,
             );
           }
-          return VoiceRecorderBox(
-            recipientId: widget.recipientId,
+          return Align(
+            alignment: Alignment.bottomCenter,
+            child: VoiceRecorderBox(
+              recipientId: recipientId,
+            ),
           );
         },
       ),
