@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -26,6 +27,12 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    HapticFeedback.lightImpact();
+    super.initState();
   }
 
   @override
