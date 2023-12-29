@@ -15,23 +15,23 @@ import 'package:min_chat/core/utils/sized_context.dart';
 class VoiceRecorderBox extends StatefulWidget {
   const VoiceRecorderBox({
     required this.recipientId,
+    required this.audioPlayer,
     super.key,
   });
 
   final String recipientId;
+  /// AudioPlayer object is a required parameter here
+  /// so that the parent widget [TextVoiceBoxToggler] can
+  /// handle it's [AudioPlayer] disposal.
+  final AudioPlayer audioPlayer;
 
   @override
   State<VoiceRecorderBox> createState() => _VoiceRecorderBoxState();
 }
 
 class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
+  
+  late AudioPlayer _audioPlayer;
 
   void _playToneOnStartRecord() {
     _audioPlayer.play(
@@ -51,6 +51,7 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
 
   @override
   void initState() {
+    _audioPlayer = widget.audioPlayer;
     HapticFeedback.lightImpact();
     _playToneOnStartRecord();
     super.initState();
@@ -161,6 +162,9 @@ class _RecorderControlsState extends State<_RecorderControls> {
   }
 
   void _startRecording() {
+    // cause a small delay before starting recorder
+    // so that the recorder start sound doesn't 
+    // seep into the actual recording
     Future.delayed(
       const Duration(milliseconds: 500),
       () => voiceCubit.startRecording(),

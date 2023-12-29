@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,15 +9,28 @@ import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/text_voice_toggler_cubit/text_voice_toggler_cubit.dart';
-import 'package:min_chat/app/features/chat/ui/cubits/voice_note_cubit/voice_note_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/message_button.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/voice_recorder_box.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
-class TextVoiceBoxToggler extends StatelessWidget {
+class TextVoiceBoxToggler extends StatefulWidget {
   const TextVoiceBoxToggler({required this.recipientId, super.key});
 
   final String recipientId;
+
+  @override
+  State<TextVoiceBoxToggler> createState() => _TextVoiceBoxTogglerState();
+}
+
+class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -42,12 +56,13 @@ class TextVoiceBoxToggler extends StatelessWidget {
             },
             child: isShowingTextBox
                 ? MessagingTextBox(
-                    recipientId: recipientId,
+                    recipientId: widget.recipientId,
                   )
                 : Align(
                     alignment: Alignment.bottomCenter,
                     child: VoiceRecorderBox(
-                      recipientId: recipientId,
+                      recipientId: widget.recipientId,
+                      audioPlayer: _audioPlayer,
                     ),
                   ),
           );
