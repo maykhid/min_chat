@@ -125,8 +125,8 @@ class _RecipientVoiceBubbleState extends State<RecipientVoiceBubble> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                if (message.status == sentStatusFlag ||
-                    message.url != null) ...[
+                // if (message.status == sentStatusFlag ||
+                //     message.url != null) ...[
                   CustomCircularIconButton(
                     icon: _isPlaying ? Icons.pause : Icons.play_arrow,
                     onPressed: _playPause,
@@ -151,18 +151,20 @@ class _RecipientVoiceBubbleState extends State<RecipientVoiceBubble> {
                       onSeek: _audioPlayer.seek,
                     ),
                   ),
-                ] else ...[
-                  const CupertinoActivityIndicator(
-                    color: Colors.grey,
-                  ),
-                  SizedBox(
-                    width: context.width * 0.3,
-                    child: const LinearProgressIndicator(
-                      minHeight: 2,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+                // ],
+
+                // else ...[
+                //   const CupertinoActivityIndicator(
+                //     color: Colors.grey,
+                //   ),
+                //   SizedBox(
+                //     width: context.width * 0.3,
+                //     child: const LinearProgressIndicator(
+                //       minHeight: 2,
+                //       color: Colors.grey,
+                //     ),
+                //   ),
+                // ],
               ],
             ),
             const Gap(4),

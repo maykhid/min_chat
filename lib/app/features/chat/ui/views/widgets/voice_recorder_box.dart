@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,14 +25,34 @@ class VoiceRecorderBox extends StatefulWidget {
 }
 
 class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   @override
   void dispose() {
+    _audioPlayer.dispose();
     super.dispose();
+  }
+
+  void _playToneOnStartRecord() {
+    _audioPlayer.play(
+      AssetSource(
+        'sounds/start-recording.mp3',
+      ),
+      volume: 0.3,
+    );
+  }
+
+  void _playToneOnCancelRecord() {
+    _audioPlayer.play(
+      AssetSource('sounds/cancel-recording.mp3'),
+      volume: 0.3,
+    );
   }
 
   @override
   void initState() {
     HapticFeedback.lightImpact();
+    _playToneOnStartRecord();
     super.initState();
   }
 
@@ -69,7 +90,10 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
                       children: [
                         // close recorder
                         CustomCircularIconButton(
-                          onPressed: textOrVoiceController.textVoiceToggle,
+                          onPressed: () {
+                            _playToneOnCancelRecord();
+                            textOrVoiceController.textVoiceToggle();
+                          },
                           icon: FontAwesomeIcons.xmark,
                         ),
 
@@ -117,10 +141,14 @@ class _RecorderControls extends StatefulWidget {
 class _RecorderControlsState extends State<_RecorderControls> {
   // bool isRecording = false;
   // bool isPlaying = false;
-  late VoiceNoteCubit voiceCubit;
+
   late AuthenticationCubit authCubit;
   late SendMessageCubit sendMessageCubit;
   late TextVoiceTogglerCubit textVoiceTogglerCubit;
+
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  late VoiceNoteCubit voiceCubit;
 
   @override
   void initState() {
@@ -128,17 +156,20 @@ class _RecorderControlsState extends State<_RecorderControls> {
     authCubit = context.read<AuthenticationCubit>();
     sendMessageCubit = context.read<SendMessageCubit>();
     textVoiceTogglerCubit = context.read<TextVoiceTogglerCubit>();
-    voiceCubit.startRecording();
+    _startRecording();
     super.initState();
   }
 
-  Future<void> _dispose() async {
-    await voiceCubit.close();
+  void _startRecording() {
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () => voiceCubit.startRecording(),
+    );
   }
 
   @override
   void dispose() {
-    _dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -210,13 +241,22 @@ class _RecorderControlsState extends State<_RecorderControls> {
     );
   }
 
+  void _playToneOnSendRecord() {
+    _audioPlayer.play(
+      AssetSource('sounds/send-recording.wav'),
+      volume: 0.3,
+    );
+  }
+
   void _sendVoiceNote({
     required Message message,
   }) {
+    _playToneOnSendRecord();
     sendMessageCubit.sendVoiceMessage(
       message: message,
       filePath: voiceCubit.path!,
     );
+
     textVoiceTogglerCubit.textVoiceToggle();
   }
 }

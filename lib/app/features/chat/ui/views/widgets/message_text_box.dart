@@ -8,6 +8,7 @@ import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/text_voice_toggler_cubit/text_voice_toggler_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/cubits/voice_note_cubit/voice_note_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/message_button.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/voice_recorder_box.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
@@ -24,17 +25,44 @@ class TextVoiceBoxToggler extends StatelessWidget {
         builder: (context, state) {
           final isShowingTextBox = state is TextState;
 
-          if (isShowingTextBox) {
-            return MessagingTextBox(
-              recipientId: recipientId,
-            );
-          }
-          return Align(
-            alignment: Alignment.bottomCenter,
-            child: VoiceRecorderBox(
-              recipientId: recipientId,
-            ),
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 1000),
+            reverseDuration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              const begin = 0.0;
+              const end = 1.0;
+              final tween = Tween(begin: begin, end: end)
+                  .chain(CurveTween(curve: Curves.elasticOut));
+              final offsetAnimation = animation.drive(tween);
+
+              return ScaleTransition(
+                scale: offsetAnimation,
+                child: child,
+              );
+            },
+            child: isShowingTextBox
+                ? MessagingTextBox(
+                    recipientId: recipientId,
+                  )
+                : Align(
+                    alignment: Alignment.bottomCenter,
+                    child: VoiceRecorderBox(
+                      recipientId: recipientId,
+                    ),
+                  ),
           );
+
+          // if (isShowingTextBox) {
+          //   return MessagingTextBox(
+          //     recipientId: recipientId,
+          //   );
+          // }
+          // return Align(
+          //   alignment: Alignment.bottomCenter,
+          //   child: VoiceRecorderBox(
+          //     recipientId: recipientId,
+          //   ),
+          // );
         },
       ),
     );

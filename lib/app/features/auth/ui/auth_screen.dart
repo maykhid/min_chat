@@ -77,7 +77,7 @@ class AuthView extends StatelessWidget {
               const Gap(8),
               // TODO(maykind): use FontAwesomeIcons.waze as icon
               const FaIcon(
-                FontAwesomeIcons.message,
+                FontAwesomeIcons.waze,
                 size: 40,
                 color: Colors.black,
               ),

@@ -39,9 +39,13 @@ class SenderChatBubble extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                   textWidthBasis: TextWidthBasis.longestLine,
                 ),
-                Text(
-                  message.timestamp!.formatToTime,
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    message.timestamp!.formatToTime,
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
                 ),
               ],
             ),

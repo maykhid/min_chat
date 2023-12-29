@@ -120,7 +120,7 @@ class _SenderVoiceBubbleState extends State<SenderVoiceBubble> {
                   CustomCircularIconButton(
                     icon: _isPlaying ? Icons.pause : Icons.play_arrow,
                     iconColor: Colors.black,
-                    buttonColor: Colors.grey,
+                    buttonColor: Colors.white,
                     onPressed: _playPause,
                   ),
                   SizedBox(
@@ -133,7 +133,7 @@ class _SenderVoiceBubbleState extends State<SenderVoiceBubble> {
                       progressBarColor: Colors.white,
                       baseBarColor: Colors.white.withOpacity(0.24),
                       bufferedBarColor: Colors.white.withOpacity(0.24),
-                      thumbColor: Colors.grey,
+                      thumbColor: Colors.white,
                       thumbRadius: 4,
                       timeLabelType: TimeLabelType.totalTime,
                       timeLabelLocation: TimeLabelLocation.none,
@@ -157,7 +157,7 @@ class _SenderVoiceBubbleState extends State<SenderVoiceBubble> {
             ),
             Text(
               message.timestamp!.formatToTime,
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
+              style: const TextStyle(fontSize: 11, color: Colors.white),
             ),
           ],
         ),

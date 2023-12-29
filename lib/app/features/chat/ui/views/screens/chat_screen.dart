@@ -199,6 +199,9 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                 final isText = chats[index].messageType == textMessageFlag ||
                     chats[index].messageType == null;
 
+                final isAudio = chats[index].messageType == audioMessageFlag &&
+                    chats[index].url != null;
+
                 if (showtime) {
                   return Column(
                     children: [
@@ -208,14 +211,22 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                           time: chats[index].timestamp!.formatDescriptive,
                         ),
                       ),
+
+                      // append sender voice or text bubble
                       if (isSentByUser)
-                        ..._showSenderTextOrAudioMessage(isText, chats, index)
+                        ..._showSenderTextOrAudioMessage(
+                          isText,
+                          chats,
+                          index,
+                        ) 
+
+                        // append recipient voice or text bubble
                       else
                         ..._showRecipientTextOrAudioMessage(
                           isText,
                           chats,
                           index,
-                        ),
+                        ), 
                     ],
                   );
                 }
@@ -231,7 +242,7 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                     );
                   }
                   return Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
                     child: SenderVoiceBubble(message: chats[index]),
                   );
                 }
@@ -244,14 +255,18 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                       child: RecipientChatBubble(message: chats[index]),
                     );
                   }
-
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: RecipientVoiceBubble(
-                      message: chats[index],
-                    ),
-                  );
+                  // show recipient voice audio only if file is audio and url
+                  // exits
+                  else if (isAudio) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: RecipientVoiceBubble(
+                        message: chats[index],
+                      ),
+                    );
+                  }
                 }
+                return null;
               },
             ),
           ),
