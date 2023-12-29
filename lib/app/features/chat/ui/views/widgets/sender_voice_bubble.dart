@@ -84,6 +84,15 @@ class _SenderVoiceBubbleState extends State<SenderVoiceBubble> {
   }
 
   @override
+  void didUpdateWidget(SenderVoiceBubble oldWidget) {
+    if (oldWidget.message.status == pendingStatusFlag &&
+        widget.message.status == sentStatusFlag) {
+      message = widget.message;
+    }
+    super.didUpdateWidget(widget);
+  }
+
+  @override
   void dispose() {
     _audioPlayer.dispose();
     super.dispose();

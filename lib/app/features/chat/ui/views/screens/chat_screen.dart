@@ -189,20 +189,23 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                 ///
                 /// else:
                 /// display other messages
-                final showtime = index == 0 ||
+                final isNewDay = index == 0 ||
                     (chats[index].timestamp!.day !=
                         chats[index - 1].timestamp!.day);
 
-                /// [isSentByUser] message was sent by our current user
-                final isSentByUser = chats[index].senderId == currentUser.id;
+                /// [isSentByCurrentUser] message was sent by our current user
+                final isSentByCurrentUser =
+                    chats[index].senderId == currentUser.id;
 
-                final isText = chats[index].messageType == textMessageFlag ||
-                    chats[index].messageType == null;
+                final isTextMessage =
+                    chats[index].messageType == textMessageFlag ||
+                        chats[index].messageType == null;
 
-                final isAudio = chats[index].messageType == audioMessageFlag &&
-                    chats[index].url != null;
+                final isAudioMessage =
+                    chats[index].messageType == audioMessageFlag &&
+                        chats[index].url != null;
 
-                if (showtime) {
+                if (isNewDay) {
                   return Column(
                     children: [
                       Padding(
@@ -213,54 +216,63 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                       ),
 
                       // append sender voice or text bubble
-                      if (isSentByUser)
+                      if (isSentByCurrentUser)
                         ..._showSenderTextOrAudioMessage(
-                          isText,
+                          isTextMessage,
                           chats,
                           index,
-                        ) 
+                        )
 
-                        // append recipient voice or text bubble
+                      // append recipient voice or text bubble
                       else
                         ..._showRecipientTextOrAudioMessage(
-                          isText,
+                          isTextMessage,
                           chats,
                           index,
-                        ), 
+                        ),
                     ],
                   );
                 }
 
                 // show sender voice or text bubble
-                if (isSentByUser) {
-                  if (isText) {
+                if (isSentByCurrentUser) {
+                  if (isTextMessage) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
                       child: SenderChatBubble(
+                        key: Key(chats[index].timestamp.toString()),
                         message: chats[index],
                       ),
                     );
                   }
+               
                   return Padding(
                     padding: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: SenderVoiceBubble(message: chats[index]),
+                    child: SenderVoiceBubble(
+                      key: Key(chats[index].timestamp.toString()),
+                      message: chats[index],
+                    ),
                   );
                 }
 
                 // show recipient voice or text bubble
                 else {
-                  if (isText) {
+                  if (isTextMessage) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: RecipientChatBubble(message: chats[index]),
+                      child: RecipientChatBubble(
+                        key: Key(chats[index].timestamp.toString()),
+                        message: chats[index],
+                      ),
                     );
                   }
                   // show recipient voice audio only if file is audio and url
                   // exits
-                  else if (isAudio) {
+                  else if (isAudioMessage) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
                       child: RecipientVoiceBubble(
+                        key: Key(chats[index].timestamp.toString()),
                         message: chats[index],
                       ),
                     );
@@ -284,12 +296,16 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
       if (isText) ...[
         Padding(
           padding: const EdgeInsets.only(top: 5),
-          child: RecipientChatBubble(message: chats[index]),
+          child: RecipientChatBubble(
+            key: Key(chats[index].timestamp.toString()),
+            message: chats[index],
+          ),
         ),
       ] else ...[
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: RecipientVoiceBubble(
+            key: Key(chats[index].timestamp.toString()),
             message: chats[index],
           ),
         ),
@@ -307,13 +323,17 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: SenderChatBubble(
+            key: Key(chats[index].timestamp.toString()),
             message: chats[index],
           ),
         ),
       ] else ...[
         Padding(
           padding: const EdgeInsets.only(top: 5),
-          child: SenderVoiceBubble(message: chats[index]),
+          child: SenderVoiceBubble(
+            key: Key(chats[index].timestamp.toString()),
+            message: chats[index],
+          ),
         ),
       ],
     ];
