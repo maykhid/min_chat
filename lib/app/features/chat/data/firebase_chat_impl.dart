@@ -28,11 +28,14 @@ class FirebaseChat implements IChat {
     try {
       late final QuerySnapshot<Map<String, dynamic>> userDocument;
 
+      // throw exception if user is trying to start conversation with
+      // themself
       if (currentUser.mID == recipientMIdOrEmail ||
           currentUser.email == recipientMIdOrEmail) {
         throw Exception('You cannot chat with yourself.');
       }
 
+      // user is trying to start conversation with a user with their email
       if (recipientMIdOrEmail.isEmail) {
         userDocument = await _firebaseFirestore
             .collection('users')
@@ -41,7 +44,9 @@ class FirebaseChat implements IChat {
               isEqualTo: recipientMIdOrEmail,
             )
             .get();
-      } else {
+      }
+      // user is trying to start conversation with a user with their mID
+      else {
         userDocument = await _firebaseFirestore
             .collection('users')
             .where(
@@ -51,9 +56,14 @@ class FirebaseChat implements IChat {
             .get();
       }
 
+      // start conversation if recipient data is found
       if (userDocument.docs.isNotEmpty) {
         final recipient = userDocument.docs.first.data();
 
+        /// A unique way of creating a docId we can always point to;
+        /// concatenate both user ids and sort.
+        ///
+        /// Note to self: Is sorting the chars really the best way?
         final docId = '${recipient['id']}${currentUser.id}'.sortChars();
 
         final conversationDocument =
@@ -61,15 +71,16 @@ class FirebaseChat implements IChat {
 
         final recipientUser = MinChatUser.fromMap(recipient);
 
-        // might add other necessary info later
-        await conversationDocument.set({
+        final conversationAsMap = {
           'participantsIds': [recipientUser.id, currentUser.id],
           'participants': [recipientUser.toMap(), currentUser.toMap()],
           'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
           'initiatedBy': currentUser.id,
           'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
           'lastMessage': null,
-        });
+        };
+
+        await conversationDocument.set(conversationAsMap);
         return MinChatUser.fromMap(recipient);
       } else {
         throw Exception('User not found!');
@@ -82,24 +93,28 @@ class FirebaseChat implements IChat {
   @override
   Future<void> sendMessage({required Message message}) async {
     try {
+      // generate unique docId for the shared conversation
       final docId = '${message.recipientId}${message.senderId}'.sortChars();
+
+      // recipient and sender conversation document
       final conversationDocument =
           _firebaseFirestore.collection('conversations').doc(docId);
 
+      // recipient and sender messages collection
       final messageCollection = conversationDocument.collection('messages');
 
       final messageAsMap = message.toMap()
         ..addAll({
           'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'messageType': textMessageFlag,
           'status': pendingStatusFlag,
         });
 
+      // add new message
       final messageRef = await messageCollection.add(
         messageAsMap,
       );
 
-      // update message status
+      // update message now with status [sent]
       await messageRef.update(
         messageAsMap
           ..addAll({
@@ -107,7 +122,7 @@ class FirebaseChat implements IChat {
           }),
       );
 
-      // update lastUpdatedAt field
+      // update conversation lastUpdatedAt and lastMessage fields
       await conversationDocument.update({
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
         'lastMessage': messageAsMap,
@@ -123,27 +138,38 @@ class FirebaseChat implements IChat {
     required String filePath,
   }) async {
     try {
+      // generate unique docId for the shared conversation
       final docId = '${message.recipientId}${message.senderId}'.sortChars();
+
+      // recipient and sender conversation document
       final conversationDocument =
           _firebaseFirestore.collection('conversations').doc(docId);
 
+      // recipient and sender messages collection
       final messageCollection = conversationDocument.collection('messages');
 
+      // add timestamp and status of message
       final messageAsMap = message.toMap()
         ..addAll({
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'messageType': audioMessageFlag,
+          'timestamp': Timestamp.now().millisecondsSinceEpoch,
           'status': pendingStatusFlag,
         });
 
+      // add new message
       final messageRef = await messageCollection.add(messageAsMap);
+
+      // ref to new audio message
       final audioMessageRef = _firebaseStorage
           .ref()
           .child('voice-messages/${DateTime.now().millisecondsSinceEpoch}.m4a');
 
+      // upload new audio message
       await audioMessageRef.putFile(File(filePath));
+
+      // get url of audio
       final url = await audioMessageRef.getDownloadURL();
 
+      // update message now with url path and status [sent]
       await messageRef.update(
         messageAsMap
           ..addAll({
@@ -152,6 +178,7 @@ class FirebaseChat implements IChat {
           }),
       );
 
+      // update conversation lastUpdatedAt and lastMessage fields
       await conversationDocument.update({
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
         'lastMessage': messageAsMap,
@@ -190,9 +217,7 @@ class FirebaseChat implements IChat {
           .snapshots()
           .map(
             (querySnapshot) => querySnapshot.docs
-                .map(
-                  (doc) => Conversation.fromMap(doc.data()),
-                )
+                .map((doc) => Conversation.fromMap(doc.data()))
                 .toList(),
           );
 }

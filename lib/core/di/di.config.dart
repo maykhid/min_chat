@@ -27,7 +27,7 @@ import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart'
 import 'package:min_chat/app/features/auth/data/user_dao.dart' as _i14;
 import 'package:min_chat/app/features/chat/data/chat_interface.dart' as _i12;
 import 'package:min_chat/app/features/chat/data/chat_repository.dart' as _i19;
-import 'package:min_chat/app/features/chat/data/firebase_chat.dart' as _i13;
+import 'package:min_chat/app/features/chat/data/firebase_chat_impl.dart' as _i13;
 import 'package:min_chat/core/di/module.dart' as _i20;
 import 'package:min_chat/core/services/voice_recorder/record_voice_recorder.dart'
     as _i17;

@@ -69,6 +69,6 @@ class ChatRepository {
         recipientId: recipientId,
       );
 
-  Stream<List<Conversation>> allUserConversations({required String userId}) =>
+  Stream<List<Conversation>> conversationStream({required String userId}) =>
       _chatInterface.conversationStream(userId: userId);
 }

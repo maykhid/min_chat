@@ -33,11 +33,11 @@ class RecordVoiceRecorder implements VoiceRecorder {
       StreamController<RecordingStatus>.broadcast();
 
   void _initListeners() {
-    _audioPlayers.onPlayerStateChanged.listen(_changeAudioPlayState);
-    _audioRecorder.onStateChanged().listen(_changeRecoderStatus);
+    _audioPlayers.onPlayerStateChanged.listen(_changePlaybackState);
+    _audioRecorder.onStateChanged().listen(_changeRecoderState);
   }
 
-  void _changeAudioPlayState(PlayerState playerState) {
+  void _changePlaybackState(PlayerState playerState) {
     switch (playerState) {
       case PlayerState.completed:
         _recordingState = RecordingStatus.playbackComplete;
@@ -61,7 +61,7 @@ class RecordVoiceRecorder implements VoiceRecorder {
     }
   }
 
-  void _changeRecoderStatus(RecordState recordState) {
+  void _changeRecoderState(RecordState recordState) {
     switch (recordState) {
       case RecordState.stop:
         _recordingState = RecordingStatus.stopped;

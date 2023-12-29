@@ -20,6 +20,7 @@ class VoiceRecorderBox extends StatefulWidget {
   });
 
   final String recipientId;
+
   /// AudioPlayer object is a required parameter here
   /// so that the parent widget [TextVoiceBoxToggler] can
   /// handle it's [AudioPlayer] disposal.
@@ -30,7 +31,6 @@ class VoiceRecorderBox extends StatefulWidget {
 }
 
 class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
-  
   late AudioPlayer _audioPlayer;
 
   void _playToneOnStartRecord() {
@@ -140,9 +140,6 @@ class _RecorderControls extends StatefulWidget {
 }
 
 class _RecorderControlsState extends State<_RecorderControls> {
-  // bool isRecording = false;
-  // bool isPlaying = false;
-
   late AuthenticationCubit authCubit;
   late SendMessageCubit sendMessageCubit;
   late TextVoiceTogglerCubit textVoiceTogglerCubit;
@@ -163,7 +160,7 @@ class _RecorderControlsState extends State<_RecorderControls> {
 
   void _startRecording() {
     // cause a small delay before starting recorder
-    // so that the recorder start sound doesn't 
+    // so that the recorder start sound doesn't
     // seep into the actual recording
     Future.delayed(
       const Duration(milliseconds: 500),
@@ -191,7 +188,6 @@ class _RecorderControlsState extends State<_RecorderControls> {
           senderId: authCubit.user.id,
           recipientId: widget.recipientId,
           message: '🎵 Audio',
-          status: pendingStatusFlag,
           messageType: audioMessageFlag,
         );
 

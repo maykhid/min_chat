@@ -46,5 +46,6 @@ const sentStatusFlag = 'Sent';
 const pendingStatusFlag = 'Pending';
 
 extension MessageX on Message {
-  bool isFromCurrentUser(String currentUserId) => senderId == currentUserId;
+  bool isMessageFromCurrentUser(String currentUserId) =>
+      senderId == currentUserId;
 }
