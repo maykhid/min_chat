@@ -105,7 +105,7 @@ class FirebaseChat implements IChat {
 
       final messageAsMap = message.toMap()
         ..addAll({
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'timestamp': Timestamp.now().millisecondsSinceEpoch,
           'status': pendingStatusFlag,
         });
 
