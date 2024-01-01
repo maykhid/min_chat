@@ -128,7 +128,7 @@ class _AwaitingMessages extends StatelessWidget {
           height: 60,
         ),
         Text(
-          '''You have no active conversations yet.\n Click the Floating action button below to begin a conversation.''',
+          '''You have no active conversations yet.\n Click the button below to begin a conversation.''',
           textAlign: TextAlign.center,
           style: GoogleFonts.varelaRound(
             fontSize: 15,
