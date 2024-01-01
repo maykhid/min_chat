@@ -119,18 +119,24 @@ class _AwaitingMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FadingWidget(
-        child: Text(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          'assets/images/min_mascot.png',
+          width: 60,
+          height: 60,
+        ),
+        Text(
           '''You have no active conversations yet.\n Click the Floating action button below to begin a conversation.''',
           textAlign: TextAlign.center,
           style: GoogleFonts.varelaRound(
-            fontSize: 30,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade300,
+            color: Colors.grey,
           ),
         ),
-      ),
+      ],
     );
   }
 }

@@ -74,15 +74,30 @@ class AuthView extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              const Gap(8),
+              // const Gap(8),
               // TODO(maykind): use FontAwesomeIcons.waze as icon
-              const FaIcon(
-                FontAwesomeIcons.waze,
-                size: 40,
-                color: Colors.black,
+              // const FaIcon(
+              //   FontAwesomeIcons.waze,
+              //   size: 40,
+              //   color: Colors.black,
+              // ),
+
+              Image.asset(
+                'assets/images/vibrant_bubble.png',
+                width: 60,
+                height: 60,
               ),
             ],
           ),
+
+          const Text(
+            'A MINimalist chat application.',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+
           const Gap(80),
           const Text(
             'Continue with',
@@ -93,6 +108,7 @@ class AuthView extends StatelessWidget {
           const Gap(20),
           AppIconButton(
             text: 'Google',
+            color: Colors.black,
             icon: const FaIcon(FontAwesomeIcons.google, size: 24),
             onPressed: signInCubit.signInWithGoogle,
           ),
