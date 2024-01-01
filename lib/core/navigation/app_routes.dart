@@ -11,23 +11,35 @@ class AppRoutes {
     // List of go routes
     GoRoute(
       path: '/',
+      name: 'auth',
       builder: (context, state) {
+        return const AuthScreen();
+      },
+      redirect: (context, state) {
         final authState = context.read<AuthenticationCubit>();
         if (authState.user.isNotEmpty) {
-          return const MessagesScreen();
+          return '/messages';
         }
-
-        return const AuthScreen();
+        return null;
       },
     ),
 
     GoRoute(
       path: MessagesScreen.name,
+      name: 'messages',
       builder: (context, state) => const MessagesScreen(),
+      redirect: (context, state) {
+        final authState = context.read<AuthenticationCubit>();
+        if (authState.user.isEmpty) {
+          return '/';
+        }
+        return null;
+      },
     ),
 
     GoRoute(
       path: Chats.name,
+      name: 'chats',
       builder: (context, state) {
         final minChatUser = state.extra! as MinChatUser;
         return Chats(

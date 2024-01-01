@@ -14,16 +14,16 @@ class MinChat extends StatelessWidget {
 
     return BlocProvider<AuthenticationCubit>(
       create: (context) => AuthenticationCubit(),
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-            bodySmall: GoogleFonts.oswald(textStyle: textTheme.bodySmall),
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
+              bodySmall: GoogleFonts.oswald(textStyle: textTheme.bodySmall),
+            ),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
+            useMaterial3: false,
           ),
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
-          useMaterial3: false,
-        ),
-        routerConfig: AppRouterConfig.goRouter,
+          routerConfig: AppRouterConfig.goRouter,
       ),
     );
   }
