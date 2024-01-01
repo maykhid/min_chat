@@ -1,7 +1,13 @@
 ## MinChat💬
+<p float="">
+  <img src= "https://github.com/maykhid/min_chat/blob/readme/screenshots/header.png?raw=true" />
+</p>
+
 A MINimalist chat application.
 
 Leave a star⭐️ if you like what you see.
+
+Contributions are highly welcome!
 
 ## ✨ Requirements
 * Any Operating System (ie. MacOS X, Linux, Windows)
