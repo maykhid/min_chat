@@ -26,6 +26,23 @@ class SendMessageCubit extends Cubit<SendMessageState> {
       emit(const SendMessageState.done());
     }
   }
+
+  Future<void> sendVoiceMessage({
+    required Message message,
+    required String filePath,
+  }) async {
+    emit(const SendMessageState.processing());
+    final response = await _chatRepository.sendVoiceMessage(
+      message: message,
+      filePath: filePath,
+    );
+
+    if (response.isFailure) {
+      emit(SendMessageState.failed(message: response.errorMessage));
+    } else {
+      emit(const SendMessageState.done());
+    }
+  }
 }
 
 class SendMessageState extends Equatable {
