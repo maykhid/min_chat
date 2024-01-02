@@ -35,7 +35,6 @@ dependencies:
   redacted: ^1.0.11
   shared_preferences: ^2.2.2
   toastification: ^1.1.0
-  very_good_analysis: ^5.1.0
 
 dev_dependencies:
   build_runner:
@@ -44,6 +43,7 @@ dev_dependencies:
     sdk: flutter
   hive_generator:
   injectable_generator:
+  very_good_analysis: ^5.1.0
 
   
 
