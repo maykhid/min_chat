@@ -39,7 +39,7 @@ dependencies:
   record: ^5.0.2
   redacted: ^1.0.11
   shared_preferences: ^2.2.2
-  toastification: ^1.1.0
+  toastification: 
 
 dev_dependencies:
   build_runner:
