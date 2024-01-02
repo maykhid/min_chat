@@ -15,11 +15,13 @@ Contributions are highly welcome!
 * Knowledge of Dart and Flutter
 
 ## 🖼 Screenshots
-<img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/auth.png?raw=true" width="300px"> *
+ <img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/auth.png?raw=true" width="300px"> *
  <img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/no_chat.png?raw=true" width="300px"> * 
  <img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/start_conversation.png?raw=true" width="300px"> 
 
-<img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/messages.png?raw=true" width="300px"> * <img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/chat.png?raw=true" width="300px"> 
+<img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/messages.png?raw=true" width="300px"> * 
+<img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/chat_voice_modal.png?raw=true" width="300px"> * 
+<img src="https://github.com/maykhid/min_chat/blob/readme/screenshots/chat.png?raw=true" width="300px"> 
 
 ## 💫 Features
 * Basic p2p chat
