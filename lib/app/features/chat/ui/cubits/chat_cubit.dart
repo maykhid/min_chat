@@ -25,8 +25,9 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   void updateChats(List<Message> chats) {
-    
-    emit(ChatState(chats: chats));
+    if (!isClosed) {
+      emit(ChatState(chats: chats));
+    }
   }
 
   void updateError(String message) =>

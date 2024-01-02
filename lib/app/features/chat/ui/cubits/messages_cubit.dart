@@ -12,11 +12,11 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   void initConversationListener({required String userId}) {
     _chatRepository
-        .allUserConversations(userId: userId)
+        .conversationStream(userId: userId)
         .listen(updateConversation)
         .onError(
           (_) => updateError(
-            '''Error: Payload validation failed. Check for issues with data types, missing fields, or incorrect values in your payload.''',
+            '''Error: An error occured.''',
           ),
         );
   }

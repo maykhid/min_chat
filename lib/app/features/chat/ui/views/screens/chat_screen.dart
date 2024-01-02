@@ -1,15 +1,18 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/chat_time_pill.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/message_text_box.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/recipient_chat_bubble.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/recipient_voice_bubble.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/sender_chat_bubble.dart';
+import 'package:min_chat/app/features/chat/ui/views/widgets/sender_voice_bubble.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
@@ -85,14 +88,14 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                 recipientId: _recipientUser.id,
                 senderId: cubit.user.id,
               ),
-            child: const ChatsView(),
+            child: const _ChatsView(),
           ),
         ),
 
         // messageing text box
         BlocProvider<SendMessageCubit>(
           create: (context) => SendMessageCubit(),
-          child: _MessagingTextBox(
+          child: TextVoiceBoxToggler(
             recipientId: _recipientUser.id,
           ),
         ),
@@ -101,16 +104,14 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   }
 }
 
-class ChatsView extends StatefulWidget {
-  const ChatsView({
-    super.key,
-  });
+class _ChatsView extends StatefulWidget {
+  const _ChatsView();
 
   @override
-  State<ChatsView> createState() => _ChatsViewState();
+  State<_ChatsView> createState() => _ChatsViewState();
 }
 
-class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
+class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
   final controller = ScrollController();
 
   static const double customScrollExtent = 250;
@@ -133,6 +134,11 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
         curve: Curves.ease,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -174,24 +180,32 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               itemCount: chats.length,
               itemBuilder: (context, index) {
-
                 ///? (Logic to show chat time on different days)
-                /// 
-                /// show message and time:     
+                ///
+                /// show message and time:
                 /// if message[index] is first message
-                /// or message[index] timestamp.day is not the same with 
+                /// or message[index] timestamp.day is not the same with
                 /// message[index - 1] timestamp.day (previous day)
-                /// 
+                ///
                 /// else:
-                /// display other messages 
-                final showtime = index == 0 ||
+                /// display other messages
+                final isNewDay = index == 0 ||
                     (chats[index].timestamp!.day !=
                         chats[index - 1].timestamp!.day);
 
-                /// [isSentByUser] message was sent by our current user
-                final isSentByUser = chats[index].senderId == currentUser.id;
-                
-                if (showtime) {
+                /// [isSentByCurrentUser] message was sent by our current user
+                final isSentByCurrentUser =
+                    chats[index].senderId == currentUser.id;
+
+                final isTextMessage =
+                    chats[index].messageType == textMessageFlag ||
+                        chats[index].messageType == null;
+
+                final isAudioMessage =
+                    chats[index].messageType == audioMessageFlag &&
+                        chats[index].url != null;
+
+                if (isNewDay) {
                   return Column(
                     children: [
                       Padding(
@@ -200,40 +214,67 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
                           time: chats[index].timestamp!.formatDescriptive,
                         ),
                       ),
-                      if (isSentByUser) ...[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: SenderChatBubble(
-                            message: chats[index],
-                          ),
+
+                      // append sender voice or text bubble
+                      if (isSentByCurrentUser)
+                        ..._showSenderTextOrAudioMessage(
+                          isTextMessage,
+                          chats,
+                          index,
+                        )
+
+                      // append recipient voice or text bubble
+                      else
+                        ..._showRecipientTextOrAudioMessage(
+                          isTextMessage,
+                          chats,
+                          index,
                         ),
-                      ] else ...[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: RecipientChatBubble(message: chats[index]),
-                        ),
-                      ],
                     ],
                   );
                 }
 
-                // show sender bubble
-                if (isSentByUser) {
+                // show sender voice or text bubble
+                if (isSentByCurrentUser) {
+                  if (isTextMessage) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: SenderChatBubble(
+                        message: chats[index],
+                      ),
+                    );
+                  }
+
                   return Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: SenderChatBubble(
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: SenderVoiceBubble(
                       message: chats[index],
                     ),
                   );
                 }
 
-                // show recipient bubble
+                // show recipient voice or text bubble
                 else {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: RecipientChatBubble(message: chats[index]),
-                  );
+                  if (isTextMessage) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: RecipientChatBubble(
+                        message: chats[index],
+                      ),
+                    );
+                  }
+                  // show recipient voice audio only if file is audio and url
+                  // exits
+                  else if (isAudioMessage) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: RecipientVoiceBubble(
+                        message: chats[index],
+                      ),
+                    );
+                  }
                 }
+                return null;
               },
             ),
           ),
@@ -241,264 +282,52 @@ class _ChatsViewState extends State<ChatsView> with WidgetsBindingObserver {
       },
     );
   }
-}
 
-class ChatTimePill extends StatelessWidget {
-  const ChatTimePill({
-    required this.time,
-    super.key,
-  });
-
-  final String time;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 5,
-        horizontal: 10,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.blueGrey.shade300,
-        borderRadius: const BorderRadiusDirectional.all(
-          Radius.circular(5),
-        ),
-      ),
-      child: Text(
-        time,
-        style: const TextStyle(fontSize: 12, color: Colors.white),
-        // style: AppTextStyles.smallTextStyleGrey,
-      ),
-    );
-  }
-}
-
-class RecipientChatBubble extends StatelessWidget {
-  const RecipientChatBubble({
-    required this.message,
-    super.key,
-  });
-
-  final Message message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: SizedBox(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
-              decoration: const BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadiusDirectional.only(
-                  topEnd: Radius.circular(8),
-                  bottomEnd: Radius.circular(8),
-                  bottomStart: Radius.circular(8),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message.message,
-                    style: const TextStyle(color: Colors.black),
-                    textWidthBasis: TextWidthBasis.longestLine,
-                  ),
-                  Text(
-                    message.timestamp!.formatToTime,
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SenderChatBubble extends StatelessWidget {
-  const SenderChatBubble({
-    required this.message,
-    super.key,
-  });
-
-  final Message message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            // height: 56,
-            // width: 200,
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
-            decoration: const BoxDecoration(
-              // color: Colors.black12,
-              color: Colors.black87,
-              borderRadius: BorderRadiusDirectional.only(
-                topStart: Radius.circular(8),
-                bottomEnd: Radius.circular(8),
-                bottomStart: Radius.circular(8),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  message.message,
-                  style: const TextStyle(color: Colors.white),
-                  textWidthBasis: TextWidthBasis.longestLine,
-                ),
-                Text(
-                  message.timestamp!.formatToTime,
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MessagingTextBox extends StatefulWidget {
-  const _MessagingTextBox({required this.recipientId});
-
-  final String recipientId;
-
-  @override
-  State<_MessagingTextBox> createState() => _MessagingTextBoxState();
-}
-
-class _MessagingTextBoxState extends State<_MessagingTextBox>
-    with WidgetsBindingObserver {
-  double _bottomOffset = 50;
-  late String _recipientId;
-
-  final controller = TextEditingController();
-
-  @override
-  void initState() {
-    _recipientId = widget.recipientId;
-    WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeMetrics() {
-    moveTextBoxPositionOnKeyboardShow();
-    super.didChangeMetrics();
-  }
-
-  void moveTextBoxPositionOnKeyboardShow() {
-    final keyboardHeight = WidgetsBinding
-        .instance.platformDispatcher.views.first.viewInsets.bottom;
-    setState(() {
-      // prevent textfield from reaching the bottom on keyboard hide
-      if (keyboardHeight < 50) {
-        _bottomOffset = 50;
-      } else {
-        _bottomOffset = context.height * 0.4;
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final sendMessageCubit = context.read<SendMessageCubit>();
-    final currentUser = context.read<AuthenticationCubit>().user;
-
-    void sendMessage() {
-      if (controller.text.isNotEmpty) {
-        sendMessageCubit.sendMessage(
-          message: Message(
-            senderId: currentUser.id,
-            recipientId: _recipientId,
-            message: controller.text,
-          ),
-        );
-        controller.clear();
-      }
-    }
-
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeInOut,
-        margin: EdgeInsets.only(bottom: _bottomOffset),
-        child: Material(
-          color: Colors.transparent,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 3,
-                  sigmaY: 3,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: controller,
-                        // onChanged: (text) => message = text,
-                        // controller: TextEditingController(),
-                        maxLines: null,
-                        enabled: true,
-                        // expands: true,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          filled: true,
-                          // fillColor: AppColors.lightGrey3,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              width: 0,
-                              color: Colors.transparent,
-                              style: BorderStyle.none,
-                            ),
-                          ),
-                          hintText: 'new message',
-                        ),
-                      ),
-                    ),
-                    const Gap(12),
-                    InkWell(
-                      onTap: sendMessage,
-                      child: const FaIcon(FontAwesomeIcons.paperPlane),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+  List<Widget> _showRecipientTextOrAudioMessage(
+    bool isText,
+    List<Message> chats,
+    int index,
+  ) {
+    return [
+      if (isText) ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: RecipientChatBubble(
+            message: chats[index],
           ),
         ),
-      ),
-    );
+      ] else ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: RecipientVoiceBubble(
+            message: chats[index],
+          ),
+        ),
+      ],
+    ];
+  }
+
+  List<Widget> _showSenderTextOrAudioMessage(
+    bool isText,
+    List<Message> chats,
+    int index,
+  ) {
+    return [
+      if (isText) ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: SenderChatBubble(
+            message: chats[index],
+          ),
+        ),
+      ] else ...[
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: SenderVoiceBubble(
+            message: chats[index],
+          ),
+        ),
+      ],
+    ];
   }
 }

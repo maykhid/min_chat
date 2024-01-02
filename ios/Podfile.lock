@@ -634,6 +634,8 @@ PODS:
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
+  - audioplayers_darwin (0.0.1):
+    - Flutter
   - BoringSSL-GRPC (0.0.24):
     - BoringSSL-GRPC/Implementation (= 0.0.24)
     - BoringSSL-GRPC/Interface (= 0.0.24)
@@ -653,12 +655,19 @@ PODS:
   - Firebase/Firestore (10.18.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 10.18.0)
+  - Firebase/Storage (10.18.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 10.18.0)
   - firebase_auth (4.14.1):
     - Firebase/Auth (= 10.18.0)
     - firebase_core
     - Flutter
-  - firebase_core (2.23.0):
+  - firebase_core (2.24.2):
     - Firebase/CoreOnly (= 10.18.0)
+    - Flutter
+  - firebase_storage (11.5.6):
+    - Firebase/Storage (= 10.18.0)
+    - firebase_core
     - Flutter
   - FirebaseAppCheckInterop (10.18.0)
   - FirebaseAuth (10.18.0):
@@ -668,6 +677,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
     - RecaptchaInterop (~> 100.0)
+  - FirebaseAuthInterop (10.18.0)
   - FirebaseCore (10.18.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.12)
@@ -696,7 +706,17 @@ PODS:
     - leveldb-library (~> 1.22)
     - nanopb (< 2.30910.0, >= 2.30908.0)
   - FirebaseSharedSwift (10.18.0)
+  - FirebaseStorage (10.18.0):
+    - FirebaseAppCheckInterop (~> 10.0)
+    - FirebaseAuthInterop (~> 10.0)
+    - FirebaseCore (~> 10.0)
+    - FirebaseCoreExtension (~> 10.0)
+    - GTMSessionFetcher/Core (< 4.0, >= 2.1)
   - Flutter (1.0.0)
+  - flutter_sound (9.2.13):
+    - Flutter
+    - flutter_sound_core (= 9.2.13)
+  - flutter_sound_core (9.2.13)
   - google_sign_in_ios (0.0.1):
     - Flutter
     - GoogleSignIn (~> 7.0)
@@ -795,17 +815,24 @@ PODS:
     - FlutterMacOS
   - PromisesObjC (2.3.1)
   - RecaptchaInterop (100.0.0)
+  - record_darwin (1.0.0):
+    - Flutter
+    - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
 
 DEPENDENCIES:
+  - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
+  - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - record_darwin (from `.symlinks/plugins/record_darwin/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 SPEC REPOS:
@@ -816,12 +843,15 @@ SPEC REPOS:
     - Firebase
     - FirebaseAppCheckInterop
     - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
     - FirebaseFirestore
     - FirebaseFirestoreInternal
     - FirebaseSharedSwift
+    - FirebaseStorage
+    - flutter_sound_core
     - GoogleSignIn
     - GoogleUtilities
     - "gRPC-C++"
@@ -834,38 +864,52 @@ SPEC REPOS:
     - RecaptchaInterop
 
 EXTERNAL SOURCES:
+  audioplayers_darwin:
+    :path: ".symlinks/plugins/audioplayers_darwin/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_storage:
+    :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
     :path: Flutter
+  flutter_sound:
+    :path: ".symlinks/plugins/flutter_sound/ios"
   google_sign_in_ios:
     :path: ".symlinks/plugins/google_sign_in_ios/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  record_darwin:
+    :path: ".symlinks/plugins/record_darwin/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
   abseil: 926fb7a82dc6d2b8e1f2ed7f3a718bce691d1e46
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
+  audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: 20bb019115acfc53278ed4c8bc5ddda77fc673bb
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
   firebase_auth: 88053a759923970e580789d167a43b6031568ef5
-  firebase_core: 29d66baf806970cda37c93621b27cd369b27db1b
+  firebase_core: 0af4a2b24f62071f9bf283691c0ee41556dcb3f5
+  firebase_storage: 62de29ba51989dbf16f6a127a181d7dfd2b71d01
   FirebaseAppCheckInterop: 3cd914842ba46f4304050874cd284de82f154ffd
   FirebaseAuth: 12314b438fa76048540c8fb86d6cfc9e08595176
+  FirebaseAuthInterop: 5818713dcd7239beb96c1125e4b14d6a5a910e5f
   FirebaseCore: 2322423314d92f946219c8791674d2f3345b598f
   FirebaseCoreExtension: 62b201498aa10535801cdf3448c7f4db5e24ed80
   FirebaseCoreInternal: 8eb002e564b533bdcf1ba011f33f2b5c10e2ed4a
   FirebaseFirestore: 171bcbb57a1a348dd171a0d5e382c03ef85a77bb
   FirebaseFirestoreInternal: 3d5d03f2447caae64311d2cda92abbf4ec5241be
   FirebaseSharedSwift: 62e248642c0582324d0390706cadd314687c116b
+  FirebaseStorage: 8333c4b183764cdd170d9539a61322b71c23adff
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_sound: c60effa2a350fb977885f0db2fbc4c1ad5160900
+  flutter_sound_core: 26c10e5832e76aaacfae252d8925232281c486ae
   google_sign_in_ios: 8115e3fbe097e6509beb819ed602d47369d9011f
   GoogleSignIn: b232380cf495a429b8095d3178a8d5855b42e842
   GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
@@ -878,8 +922,9 @@ SPEC CHECKSUMS:
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  record_darwin: 1f6619f2abac4d1ca91d3eeab038c980d76f1517
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
 
-PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
+PODFILE CHECKSUM: 6b9eb94e9f98a329f2ef624b852a6e42d090af2b
 
 COCOAPODS: 1.12.1

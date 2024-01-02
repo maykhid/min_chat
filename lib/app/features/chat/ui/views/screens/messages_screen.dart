@@ -92,7 +92,7 @@ class MessagesScreenView extends StatelessWidget {
                 // final hasData = [].isNotEmpty;
 
                 if (!hasData) {
-                  return const _AwaitingOrder();
+                  return const _AwaitingMessages();
                 }
 
                 return ListView.builder(
@@ -114,15 +114,16 @@ class MessagesScreenView extends StatelessWidget {
   }
 }
 
-class _AwaitingOrder extends StatelessWidget {
-  const _AwaitingOrder();
+class _AwaitingMessages extends StatelessWidget {
+  const _AwaitingMessages();
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: FadingWidget(
         child: Text(
-          'Awaiting your order...',
+          '''You have no active conversations yet.\n Click the Floating action button below to begin a conversation.''',
+          textAlign: TextAlign.center,
           style: GoogleFonts.varelaRound(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -153,10 +154,12 @@ class MessagesListItem extends StatelessWidget {
     final hasLastMessage = conversation.lastMessage != null;
 
     String senderName() {
+      // currrent user sent last message
       if (hasLastMessage &&
-          conversation.lastMessage!.isFromCurrentUser(currentUser.id)) {
+          conversation.lastMessage!.isMessageFromCurrentUser(currentUser.id)) {
         return 'You';
       }
+      // recipient sent last message
       return conversationUser.name!.firstword;
     }
 
