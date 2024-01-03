@@ -12,12 +12,10 @@ class AppRoutes {
     GoRoute(
       path: '/',
       name: 'auth',
-      builder: (context, state) {
-        return const AuthScreen();
-      },
+      builder: (context, state) => const AuthScreen(),
       redirect: (context, state) {
-        final authState = context.read<AuthenticationCubit>();
-        if (authState.user.isNotEmpty) {
+        final authState = context.read<AuthenticationCubit>().state;
+        if (authState.status == AuthenticationStatus.authenticated) {
           return '/messages';
         }
         return null;
@@ -29,8 +27,9 @@ class AppRoutes {
       name: 'messages',
       builder: (context, state) => const MessagesScreen(),
       redirect: (context, state) {
-        final authState = context.read<AuthenticationCubit>();
-        if (authState.user.isEmpty) {
+        final authState = context.read<AuthenticationCubit>().state;
+
+        if (authState.status == AuthenticationStatus.unauthenticated) {
           return '/';
         }
         return null;

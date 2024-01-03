@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:min_chat/app/features/auth/data/authentication_repository.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/core/di/di.dart';
 import 'package:min_chat/core/navigation/app_navigation_config.dart';
 
 class MinChat extends StatelessWidget {
@@ -13,17 +15,19 @@ class MinChat extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return BlocProvider<AuthenticationCubit>(
-      create: (context) => AuthenticationCubit(),
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-              bodySmall: GoogleFonts.oswald(textStyle: textTheme.bodySmall),
-            ),
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
-            useMaterial3: false,
+      create: (context) => AuthenticationCubit(
+        authenticationRepository: locator<AuthenticationRepository>(),
+      ),
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
+            bodySmall: GoogleFonts.oswald(textStyle: textTheme.bodySmall),
           ),
-          routerConfig: AppRouterConfig.goRouter,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
+          useMaterial3: false,
+        ),
+        routerConfig: AppRouterConfig.goRouter,
       ),
     );
   }

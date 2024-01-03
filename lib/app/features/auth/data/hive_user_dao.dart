@@ -27,4 +27,7 @@ class HiveUserDao implements UserDao {
 
   @override
   void deleteUser() => _userBox.delete(key);
+
+  @override
+  bool get userExists => _userBox.isNotEmpty;
 }
