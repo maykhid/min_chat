@@ -39,6 +39,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     }
   }
 
+  void signOut() => unawaited(_authenticationRepository.signOut());
+
   @override
   Future<void> close() {
     _userSubscription.cancel();

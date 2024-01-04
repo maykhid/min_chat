@@ -29,8 +29,11 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(MessagesState(conversations: conversations));
   }
 
-  void updateError(String message) =>
+  void updateError(String message) {
+    if (!isClosed) {
       emit(MessagesState.withError(message, state.conversations));
+    }
+  }
 
   @override
   Future<void> close() {

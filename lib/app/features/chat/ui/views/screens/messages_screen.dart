@@ -12,6 +12,7 @@ import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
+import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/app/shared/ui/app_text_field.dart';
@@ -58,6 +59,7 @@ class MessagesScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.read<AuthenticationCubit>().state.user;
     return SafeArea(
       child: Column(
         children: [
@@ -67,12 +69,26 @@ class MessagesScreenView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Gap(20),
-                Text(
-                  'Messages',
-                  style: GoogleFonts.varelaRound(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Messages',
+                      style: GoogleFonts.varelaRound(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => context.push(
+                        UserOptionsScreen.name,
+                      ),
+                      child: CircleAvatar(
+                        radius: 15,
+                        backgroundImage: NetworkImage(user.imageUrl!),
+                      ),
+                    ),
+                  ],
                 ),
                 const Gap(8),
                 CupertinoSearchTextField(
