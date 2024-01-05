@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
@@ -140,7 +141,7 @@ class _RecorderControls extends StatefulWidget {
 }
 
 class _RecorderControlsState extends State<_RecorderControls> {
-  late AuthenticationCubit authCubit;
+  late MinChatUser user;
   late SendMessageCubit sendMessageCubit;
   late TextVoiceTogglerCubit textVoiceTogglerCubit;
 
@@ -151,7 +152,7 @@ class _RecorderControlsState extends State<_RecorderControls> {
   @override
   void initState() {
     voiceCubit = context.read<VoiceNoteCubit>();
-    authCubit = context.read<AuthenticationCubit>();
+    user = context.read<AuthenticationCubit>().state.user;
     sendMessageCubit = context.read<SendMessageCubit>();
     textVoiceTogglerCubit = context.read<TextVoiceTogglerCubit>();
     _startRecording();
@@ -185,7 +186,7 @@ class _RecorderControlsState extends State<_RecorderControls> {
             state is! PlaybackStoppedState;
 
         final message = Message(
-          senderId: authCubit.user.id,
+          senderId: user.id,
           recipientId: widget.recipientId,
           message: '🎵 Audio',
           messageType: audioMessageFlag,

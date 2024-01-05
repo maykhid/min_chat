@@ -12,10 +12,10 @@ import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
+import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/app/shared/ui/app_text_field.dart';
-import 'package:min_chat/app/shared/ui/fading_widget.dart';
 import 'package:min_chat/core/utils/data_response.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/participants_x.dart';
@@ -36,7 +36,7 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<AuthenticationCubit>();
+    final user = context.read<AuthenticationCubit>().state.user;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
@@ -45,7 +45,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
       body: BlocProvider<MessagesCubit>(
         create: (context) =>
-            MessagesCubit()..initConversationListener(userId: cubit.user.id),
+            MessagesCubit()..initConversationListener(userId: user.id),
         child: const MessagesScreenView(),
       ),
     );
@@ -59,6 +59,7 @@ class MessagesScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.read<AuthenticationCubit>().state.user;
     return SafeArea(
       child: Column(
         children: [
@@ -68,12 +69,26 @@ class MessagesScreenView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Gap(20),
-                Text(
-                  'Messages',
-                  style: GoogleFonts.varelaRound(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Messages',
+                      style: GoogleFonts.varelaRound(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => context.push(
+                        UserOptionsScreen.name,
+                      ),
+                      child: CircleAvatar(
+                        radius: 15,
+                        backgroundImage: NetworkImage(user.imageUrl!),
+                      ),
+                    ),
+                  ],
                 ),
                 const Gap(8),
                 CupertinoSearchTextField(
@@ -119,18 +134,24 @@ class _AwaitingMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FadingWidget(
-        child: Text(
-          '''You have no active conversations yet.\n Click the Floating action button below to begin a conversation.''',
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          'assets/images/min_mascot.png',
+          width: 60,
+          height: 60,
+        ),
+        Text(
+          '''You have no active conversations yet.\n Click the button below to begin a conversation.''',
           textAlign: TextAlign.center,
           style: GoogleFonts.varelaRound(
-            fontSize: 30,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade300,
+            color: Colors.grey,
           ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -145,9 +166,9 @@ class MessagesListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.read<AuthenticationCubit>().user;
+    final user = context.read<AuthenticationCubit>().state.user;
     final conversationUser = conversation.participants
-        .extrapolateParticipantByCurrentUserId(currentUser.id);
+        .extrapolateParticipantByCurrentUserId(user.id);
 
     const border = BorderSide(width: 0.3, color: Colors.grey);
 
@@ -156,7 +177,7 @@ class MessagesListItem extends StatelessWidget {
     String senderName() {
       // currrent user sent last message
       if (hasLastMessage &&
-          conversation.lastMessage!.isMessageFromCurrentUser(currentUser.id)) {
+          conversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
         return 'You';
       }
       // recipient sent last message
@@ -266,7 +287,7 @@ class _StartConversationWidgetState extends State<StartConversationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<AuthenticationCubit>().user;
+    final user = context.read<AuthenticationCubit>().state.user;
 
     late String midOrEmail;
 

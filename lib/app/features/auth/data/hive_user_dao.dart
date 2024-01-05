@@ -18,10 +18,16 @@ class HiveUserDao implements UserDao {
     if (_userBox.isEmpty) {
       return MinChatUser.empty;
     }
-    return _userBox.get(key)!;
+    return _userBox.get(key) ?? MinChatUser.empty;
   }
 
   @override
   void writeUser(MinChatUser authenticatedUser) =>
       _userBox.put(key, authenticatedUser);
+
+  @override
+  void deleteUser() => _userBox.delete(key);
+
+  @override
+  bool get userExists => _userBox.isNotEmpty;
 }

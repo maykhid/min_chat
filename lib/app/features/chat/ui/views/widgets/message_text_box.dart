@@ -150,14 +150,14 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
   @override
   Widget build(BuildContext context) {
     final sendMessageCubit = context.read<SendMessageCubit>();
-    final currentUser = context.read<AuthenticationCubit>().user;
+    final user = context.read<AuthenticationCubit>().state.user;
     final textOrVoiceController = context.read<TextVoiceTogglerCubit>();
 
     void sendMessage() {
       if (_textController.text.isNotEmpty) {
         sendMessageCubit.sendMessage(
           message: Message(
-            senderId: currentUser.id,
+            senderId: user.id,
             recipientId: _recipientId,
             message: _textController.text,
             messageType: textMessageFlag,
