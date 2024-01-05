@@ -21,7 +21,7 @@ class RecordingScreen extends StatefulWidget {
   const RecordingScreen({super.key});
 
   @override
-  _RecordingScreenState createState() => _RecordingScreenState();
+  State<RecordingScreen> createState() => _RecordingScreenState();
 }
 
 class _RecordingScreenState extends State<RecordingScreen> {
@@ -52,18 +52,12 @@ class _RecordingScreenState extends State<RecordingScreen> {
             listener: (context, state) {
               if (state is RecordingState) {
                 _isRecording = true;
-
-                print('Lisnert record');
               } else if (state is PlaybackState) {
                 _isPlaying = true;
                 // path = state.;
-
-                print('Lisnert play');
               } else if (state is PlaybackStoppedState ||
                   state is PlaybackCompleteState) {
                 _isPlaying = false;
-
-                print('Lisnert stoped');
               } else if (state is StoppedState) {
                 // path = state.path;
                 _isRecording = false;

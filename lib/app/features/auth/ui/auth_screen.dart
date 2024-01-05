@@ -74,13 +74,6 @@ class AuthView extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              // const Gap(8),
-              // TODO(maykind): use FontAwesomeIcons.waze as icon
-              // const FaIcon(
-              //   FontAwesomeIcons.waze,
-              //   size: 40,
-              //   color: Colors.black,
-              // ),
 
               Image.asset(
                 'assets/images/vibrant_bubble.png',
