@@ -1,7 +1,8 @@
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 
 abstract class IAuthentication {
-  // AuthenticatedUser get user;
+  MinChatUser get authenticatedUser;
   Future<void> signInGithub();
-  Future<MinChatUser> signInWithGoogle();
+  Future<void> signInWithGoogle();
+  Future<void> signOut();
 }

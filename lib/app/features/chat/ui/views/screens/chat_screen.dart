@@ -38,7 +38,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<AuthenticationCubit>();
+    final user = context.read<AuthenticationCubit>().state.user;
     return Stack(
       children: [
         Scaffold(
@@ -86,7 +86,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             create: (context) => ChatCubit()
               ..initMessageListener(
                 recipientId: _recipientUser.id,
-                senderId: cubit.user.id,
+                senderId: user.id,
               ),
             child: const _ChatsView(),
           ),
@@ -165,7 +165,7 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.read<AuthenticationCubit>().user;
+    final user = context.read<AuthenticationCubit>().state.user;
 
     return BlocBuilder<ChatCubit, ChatState>(
       builder: (context, state) {
@@ -194,8 +194,7 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                         chats[index - 1].timestamp!.day);
 
                 /// [isSentByCurrentUser] message was sent by our current user
-                final isSentByCurrentUser =
-                    chats[index].senderId == currentUser.id;
+                final isSentByCurrentUser = chats[index].senderId == user.id;
 
                 final isTextMessage =
                     chats[index].messageType == textMessageFlag ||

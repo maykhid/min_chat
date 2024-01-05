@@ -4,8 +4,8 @@ import 'package:hive/hive.dart';
 part 'authenticated_user.g.dart';
 
 @HiveType(typeId: 0)
-class MinChatUser extends HiveObject with EquatableMixin {
-  MinChatUser({
+class MinChatUser with EquatableMixin {
+  const MinChatUser({
     required this.id,
     this.name,
     this.email,
@@ -47,7 +47,7 @@ class MinChatUser extends HiveObject with EquatableMixin {
   }
 
   /// Empty user which represents an unauthenticated user.
-  static final empty = MinChatUser(id: '');
+  static const empty = MinChatUser(id: '');
 
   /// Convenience getter to determine whether the current user is empty.
   bool get isEmpty => this == MinChatUser.empty;
