@@ -7,6 +7,7 @@ import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
+import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/string_x.dart';
 
 @Singleton(as: IChat)
@@ -220,4 +221,41 @@ class FirebaseChat implements IChat {
                 .map((doc) => Conversation.fromMap(doc.data()))
                 .toList(),
           );
+
+  @override
+  Future<List<MinChatUser>> getConversers({required String userId}) async {
+    try {
+      // get all conversations where current user is part of
+      final conversationsRef = await _firebaseFirestore
+          .collection('conversations')
+          .where(
+            'participantsIds',
+            arrayContains: userId,
+          )
+          .get();
+
+      final conversationDocs = conversationsRef.docs;
+
+      // all of this user conversations
+      final conversations = conversationDocs
+          .map(
+            (conversationSnapshot) =>
+                Conversation.fromMap(conversationSnapshot.data()),
+          )
+          .toList();
+
+      // users who partook i.e conversers
+      final users = conversations
+          .map(
+            (conversation) => conversation.participants
+                .extrapolateParticipantByCurrentUserId(userId),
+          )
+          .toList();
+
+      return users;
+    } catch (e) {
+      print(e);
+      throw Exception(e);
+    }
+  }
 }

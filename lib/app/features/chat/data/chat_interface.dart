@@ -26,4 +26,7 @@ abstract class IChat {
 
   /// A Stream of this user [Conversation]s
   Stream<List<Conversation>> conversationStream({required String userId});
+
+  /// Get the list of all users that the [currentUser] converses with
+  Future<List<MinChatUser>> getConversers({required String userId});
 }

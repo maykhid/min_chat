@@ -71,4 +71,15 @@ class ChatRepository {
 
   Stream<List<Conversation>> conversationStream({required String userId}) =>
       _chatInterface.conversationStream(userId: userId);
+
+  Future<Result<List<MinChatUser>>> getConversers({
+    required String userId,
+  }) async {
+    try {
+      final response = await _chatInterface.getConversers(userId: userId);
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(errorMessage: e.toString());
+    }
+  }
 }
