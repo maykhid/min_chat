@@ -15,6 +15,7 @@ import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
 import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
+import 'package:min_chat/app/shared/ui/app_expandable_fab.dart';
 import 'package:min_chat/app/shared/ui/app_text_field.dart';
 import 'package:min_chat/core/utils/data_response.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
@@ -38,11 +39,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     final user = context.read<AuthenticationCubit>().state.user;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
-        child: const FaIcon(FontAwesomeIcons.penToSquare),
-        onPressed: () => _showStartConversationModal(context),
-      ),
+      floatingActionButton: _buildExpandableFab(context),
       body: BlocProvider<MessagesCubit>(
         create: (context) =>
             MessagesCubit()..initConversationListener(userId: user.id),
@@ -191,7 +188,7 @@ class MessagesListItem extends StatelessWidget {
         width: context.width,
         padding: const EdgeInsets.only(
           left: 9,
-          right: 9,
+          right: 8,
         ),
         decoration: const BoxDecoration(
           border: Border(top: border, bottom: border),
@@ -247,13 +244,6 @@ class MessagesListItem extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showStartConversationModal(BuildContext context) {
-  AppDialog.showAppDialog(
-    context,
-    const StartConversationWidget(),
-  );
 }
 
 class StartConversationWidget extends StatefulWidget {
@@ -370,4 +360,29 @@ class _StartConversationWidgetState extends State<StartConversationWidget> {
       ),
     );
   }
+}
+
+void _showStartConversationModal(BuildContext context) {
+  AppDialog.showAppDialog(
+    context,
+    const StartConversationWidget(),
+  );
+}
+
+AppExpandableFab _buildExpandableFab(BuildContext context) {
+  return AppExpandableFab(
+    distance: 70,
+    children: [
+      ActionButton(
+        tooltip: 'Start a group chat',
+        onPressed: () {},
+        icon: const FaIcon(FontAwesomeIcons.userGroup),
+      ),
+      ActionButton(
+        tooltip: 'Start a conversation',
+        onPressed: () => _showStartConversationModal(context),
+        icon: const FaIcon(FontAwesomeIcons.userPen),
+      ),
+    ],
+  );
 }
