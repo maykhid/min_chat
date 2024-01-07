@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -62,14 +63,22 @@ class _AppExpandableFabState extends State<AppExpandableFab>
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
-      child: Stack(
-        alignment: Alignment.bottomRight,
-        clipBehavior: Clip.none,
-        children: [
-          _buildTapToCloseFab(),
-          ..._buildExpandingActionButtons(),
-          _buildTapToOpenFab(),
-        ],
+      child: BackdropFilter(
+        filter: _open
+            ? ImageFilter.blur(
+                sigmaX: 2,
+                sigmaY: 2,
+              )
+            : ImageFilter.blur(),
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          clipBehavior: Clip.none,
+          children: [
+            _buildTapToCloseFab(),
+            ..._buildExpandingActionButtons(),
+            _buildTapToOpenFab(),
+          ],
+        ),
       ),
     );
   }
