@@ -5,7 +5,7 @@ class AppIconButton extends StatelessWidget {
   const AppIconButton({
     required this.text,
     required this.icon,
-    required this.onPressed,
+    this.onPressed,
     this.color,
     this.width,
     this.height,
@@ -21,7 +21,7 @@ class AppIconButton extends StatelessWidget {
   final double? borderRadius;
   final Widget icon;
   final bool isLoading;
-  final void Function() onPressed;
+  final void Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {

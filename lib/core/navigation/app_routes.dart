@@ -5,6 +5,7 @@ import 'package:min_chat/app/features/auth/ui/auth_screen.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/messages_screen.dart';
+import 'package:min_chat/app/features/chat/ui/views/screens/start_groupchat_screen.dart';
 import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
 
 class AppRoutes {
@@ -52,6 +53,12 @@ class AppRoutes {
       path: UserOptionsScreen.name,
       name: 'userOptions',
       builder: (context, state) => const UserOptionsScreen(),
+    ),
+
+    GoRoute(
+      path: StartGroupchatScreen.name,
+      name: 'startGroupchat',
+      builder: (context, state) => const StartGroupchatScreen(),
     ),
   ];
 }

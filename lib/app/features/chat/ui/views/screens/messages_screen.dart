@@ -12,6 +12,7 @@ import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
+import 'package:min_chat/app/features/chat/ui/views/screens/start_groupchat_screen.dart';
 import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
@@ -375,7 +376,7 @@ AppExpandableFab _buildExpandableFab(BuildContext context) {
     children: [
       ActionButton(
         tooltip: 'Start a group chat',
-        onPressed: () {},
+        onPressed: () => context.push(StartGroupchatScreen.name),
         icon: const FaIcon(FontAwesomeIcons.userGroup),
       ),
       ActionButton(
