@@ -244,7 +244,7 @@ class FirebaseChat implements IChat {
           )
           .toList();
 
-      // users who partook i.e conversers
+      // users who partook in the conversations i.e conversers
       final users = conversations
           .map(
             (conversation) => conversation.participants
