@@ -1,5 +1,6 @@
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 
 abstract class IChat {
@@ -27,6 +28,11 @@ abstract class IChat {
   /// A Stream of this user [Conversation]s
   Stream<List<Conversation>> conversationStream({required String userId});
 
-  /// Get the list of all users that the [currentUser] converses with
+  /// Get the list of all users that the current [MinChatUser] converses with
   Future<List<MinChatUser>> getConversers({required String userId});
+
+  /// Start a group conversation
+  Future<void> startAGroupConversation({
+    required GroupConversation conversation,
+  });
 }

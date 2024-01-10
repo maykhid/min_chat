@@ -3,6 +3,7 @@ import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/data/user_dao.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/data/model/result.dart';
 
@@ -77,6 +78,19 @@ class ChatRepository {
   }) async {
     try {
       final response = await _chatInterface.getConversers(userId: userId);
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(errorMessage: e.toString());
+    }
+  }
+
+  Future<Result<void>> startAGroupConversation({
+    required GroupConversation conversation,
+  }) async {
+    try {
+      final response = await _chatInterface.startAGroupConversation(
+        conversation: conversation,
+      );
       return Result.success(response);
     } catch (e) {
       return Result.failure(errorMessage: e.toString());

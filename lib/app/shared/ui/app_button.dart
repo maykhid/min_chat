@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -29,8 +30,8 @@ class AppIconButton extends StatelessWidget {
       onPressed: onPressed,
       icon: icon,
       label: isLoading
-          ? const CircularProgressIndicator.adaptive(
-              backgroundColor: Colors.white,
+          ? const CupertinoActivityIndicator(
+              color: Colors.white,
             )
           : Text(
               text,

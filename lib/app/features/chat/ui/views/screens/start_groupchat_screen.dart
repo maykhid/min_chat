@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_groupchat_cubit/start_groupchat_cubit.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
+import 'package:min_chat/app/shared/ui/app_dialog.dart';
+import 'package:min_chat/app/shared/ui/app_text_field.dart';
+import 'package:min_chat/core/utils/sized_context.dart';
+import 'package:toastification/toastification.dart';
 
 class StartGroupchatScreen extends StatefulWidget {
   const StartGroupchatScreen({super.key});
@@ -19,7 +23,7 @@ class StartGroupchatScreen extends StatefulWidget {
 
 class _StartGroupchatScreenState extends State<StartGroupchatScreen> {
   bool _isCreateGroupButtonEnabled = false;
-  final _selectedUsers = <MinChatUser>[];
+  // final _selectedUsers = <MinChatUser>[];
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +46,16 @@ class _StartGroupchatScreenState extends State<StartGroupchatScreen> {
         body: BlocConsumer<StartGroupchatCubit, StartGroupchatState>(
           listener: (context, state) {
             if (state is ErrorState) {
-              print(state.errorMessage);
-            }
+              // error message display
+            } 
           },
           builder: (context, state) {
+            final selectedUsers =
+                context.read<StartGroupchatCubit>().selectedParticipants;
             if (state is StartGroupchatInitial) {
               return const Center(child: CupertinoActivityIndicator());
             } else {
-              final users = (state as GotConversersState).conversers;
+              final users = state.conversers;
 
               if (users.isEmpty) {
                 return const _NoConversers();
@@ -78,15 +84,16 @@ class _StartGroupchatScreenState extends State<StartGroupchatScreen> {
                         // shape: const CircleBorder(side: BorderSide()),
                         title: Text(user.name!),
                         subtitle: Text(user.mID!),
-                        value: _selectedUsers.contains(user),
+                        value: selectedUsers.contains(user),
                         onChanged: (selected) {
                           setState(() {
                             if (selected!) {
-                              _selectedUsers.add(user);
+                              selectedUsers.add(user);
                             } else {
-                              _selectedUsers.remove(user);
+                              selectedUsers.remove(user);
                             }
-                            _updateCreateGroupButtonState();
+                            _isCreateGroupButtonEnabled =
+                                selectedUsers.isNotEmpty;
                           });
                         },
                       );
@@ -102,11 +109,9 @@ class _StartGroupchatScreenState extends State<StartGroupchatScreen> {
                         color: Colors.black,
                         icon: Container(),
                         height: 40,
-                        // width: 130,
+                        isLoading: state is CreatingGroupChatState,
                         onPressed: _isCreateGroupButtonEnabled
-                            ? () {
-                                // Implement group creation logic using selected contacts
-                              }
+                            ? () => _showStartConversationModal(context)
                             : null,
                       ),
                     ),
@@ -118,12 +123,6 @@ class _StartGroupchatScreenState extends State<StartGroupchatScreen> {
         ),
       ),
     );
-  }
-
-  void _updateCreateGroupButtonState() {
-    setState(() {
-      _isCreateGroupButtonEnabled = _selectedUsers.isNotEmpty;
-    });
   }
 }
 
@@ -152,4 +151,141 @@ class _NoConversers extends StatelessWidget {
       ],
     );
   }
+}
+
+class EnterGroupNameWidget extends StatefulWidget {
+  const EnterGroupNameWidget({
+    required this.cubit,
+    super.key,
+  });
+
+  final StartGroupchatCubit cubit;
+
+  @override
+  State<EnterGroupNameWidget> createState() => _EnterGroupNameWidgetState();
+}
+
+class _EnterGroupNameWidgetState extends State<EnterGroupNameWidget> {
+  final formKey = GlobalKey<FormState>();
+  final controller = TextEditingController();
+  final focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.read<AuthenticationCubit>().state.user;
+    final cubit = widget.cubit;
+
+    late String groupName;
+
+    GroupConversation buildConversation() {
+      // group conversation data
+      return GroupConversation(
+        initiatedBy: user.id,
+        initiatedAt: DateTime.now(),
+        lastUpdatedAt: DateTime.now(),
+        participantsIds: cubit.selectedParticipants.map((e) => e.id).toList()
+          ..add(user.id),
+        groupName: groupName,
+      );
+    }
+
+    void handleStartGroupchat(StartGroupchatCubit cubit) {
+      final isValid = formKey.currentState!.validate();
+
+      if (isValid) {
+        formKey.currentState!.save();
+        focusNode.unfocus();
+
+        cubit.startGroupChat(
+          groupConversation: buildConversation(),
+        );
+      }
+    }
+
+    return BlocProvider.value(
+      value: cubit,
+      child: Form(
+        key: formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: SizedBox(
+          height: 190,
+          width: context.width * 0.9,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                const Text(
+                  'Enter a group name',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(
+                  height: 70,
+                  child: AppTextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    validate: (name) {
+                      if (name!.isEmpty || name.length < 3) {
+                        return 'Not a valid group name';
+                      }
+                      return null;
+                    },
+                    borderRadius: 10,
+                    onSaved: (value) => groupName = value!,
+                  ),
+                ),
+                BlocConsumer<StartGroupchatCubit, StartGroupchatState>(
+                  listener: (context, state) {
+                    if (state is GroupChatCreatedState) {
+                      // context
+                      //   ..pop() // remove dialog
+                      //   ..push('');
+                    } else if (state is ErrorState) {
+                      toastification.show(
+                        context: context,
+                        title: state.errorMessage!,
+                        type: ToastificationType.error,
+                        autoCloseDuration: const Duration(seconds: 3),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    return AppIconButton(
+                      text: 'OK',
+                      icon: const SizedBox.shrink(),
+                      height: 15,
+                      width: 120,
+                      borderRadius: 8,
+                      color: Colors.black,
+                      isLoading: state is CreatingGroupChatState,
+                      onPressed: () => handleStartGroupchat(cubit),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+void _showStartConversationModal(BuildContext context) {
+  AppDialog.showAppDialog(
+    context,
+    EnterGroupNameWidget(
+      cubit: context.read<StartGroupchatCubit>(),
+    ),
+  );
 }

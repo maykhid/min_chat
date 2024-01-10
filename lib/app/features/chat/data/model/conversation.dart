@@ -8,12 +8,14 @@ class Conversation extends Equatable {
     required this.initiatedBy,
     required this.initiatedAt,
     required this.lastUpdatedAt,
+     this.participantsIds,
     this.lastMessage,
   });
 
   factory Conversation.fromMap(Map<String, dynamic> data) {
     // final data = doc.data()! as Map<String, dynamic>;
     final participantsData = data['participants'] as List<dynamic>;
+    // final participantsIds = data['participantsIds'] as List<String>;
 
     final participants = participantsData
         .map((e) => MinChatUser.fromMap(e as Map<String, dynamic>))
@@ -30,6 +32,7 @@ class Conversation extends Equatable {
       participants: participants,
       lastUpdatedAt:
           DateTime.fromMillisecondsSinceEpoch(data['lastUpdatedAt'] as int),
+      
       lastMessage: message,
     );
   }
@@ -38,14 +41,16 @@ class Conversation extends Equatable {
   final String initiatedBy;
   final DateTime initiatedAt;
   final DateTime lastUpdatedAt;
+  final List<String>? participantsIds;
   final Message? lastMessage;
 
   Map<String, dynamic> toMap() {
     return {
-      'initiatedAt': initiatedAt,
+      'initiatedAt': initiatedAt.millisecondsSinceEpoch,
       'initiatedBy': initiatedBy,
       'participants': participants.map((user) => user.toMap()).toList(),
-      'lastUpdatedAt': lastUpdatedAt,
+      'lastUpdatedAt': lastUpdatedAt.millisecondsSinceEpoch,
+      'participantsIds': participantsIds,
       'lastMessage': lastMessage?.toMap(),
     };
   }

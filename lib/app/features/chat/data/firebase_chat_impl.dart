@@ -6,6 +6,7 @@ import 'package:injectable/injectable.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/string_x.dart';
@@ -72,7 +73,7 @@ class FirebaseChat implements IChat {
 
         final recipientUser = MinChatUser.fromMap(recipient);
 
-        final conversationAsMap = {
+        final conversationData = {
           'participantsIds': [recipientUser.id, currentUser.id],
           'participants': [recipientUser.toMap(), currentUser.toMap()],
           'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
@@ -81,7 +82,7 @@ class FirebaseChat implements IChat {
           'lastMessage': null,
         };
 
-        await conversationDocument.set(conversationAsMap);
+        await conversationDocument.set(conversationData);
         return MinChatUser.fromMap(recipient);
       } else {
         throw Exception('User not found!');
@@ -254,7 +255,22 @@ class FirebaseChat implements IChat {
 
       return users;
     } catch (e) {
-      print(e);
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> startAGroupConversation({
+    required GroupConversation conversation,
+  }) async {
+    try {
+      // create a conversation document
+      final groupConversationDoc =
+          _firebaseFirestore.collection('group-conversations').doc();
+
+      // add a conversation
+      await groupConversationDoc.set(conversation.toMap());
+    } catch (e) {
       throw Exception(e);
     }
   }
