@@ -28,6 +28,11 @@ abstract class IChat {
   /// A Stream of this user [Conversation]s
   Stream<List<Conversation>> conversationStream({required String userId});
 
+   /// A Stream of this user [GroupConversation]s
+  Stream<List<GroupConversation>> groupConversationStream({
+    required String userId,
+  });
+
   /// Get the list of all users that the current [MinChatUser] converses with
   Future<List<MinChatUser>> getConversers({required String userId});
 

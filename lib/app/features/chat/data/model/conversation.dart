@@ -2,14 +2,20 @@ import 'package:equatable/equatable.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 
-class Conversation extends Equatable {
-  const Conversation({
+/// classes that 
+abstract class SortableConversation {
+  DateTime get lastUpdatedAt;
+}
+
+class Conversation extends SortableConversation with EquatableMixin {
+  Conversation({
     required this.participants,
     required this.initiatedBy,
     required this.initiatedAt,
     required this.lastUpdatedAt,
-     this.participantsIds,
+    this.participantsIds,
     this.lastMessage,
+    this.documentId,
   });
 
   factory Conversation.fromMap(Map<String, dynamic> data) {
@@ -32,17 +38,19 @@ class Conversation extends Equatable {
       participants: participants,
       lastUpdatedAt:
           DateTime.fromMillisecondsSinceEpoch(data['lastUpdatedAt'] as int),
-      
       lastMessage: message,
+      documentId: data['documentId'] as String?,
     );
   }
 
   final List<MinChatUser> participants;
   final String initiatedBy;
   final DateTime initiatedAt;
+  @override
   final DateTime lastUpdatedAt;
   final List<String>? participantsIds;
   final Message? lastMessage;
+  final String? documentId;
 
   Map<String, dynamic> toMap() {
     return {

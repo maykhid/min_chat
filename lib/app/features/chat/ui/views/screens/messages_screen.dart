@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
@@ -160,90 +161,172 @@ class MessagesListItem extends StatelessWidget {
     super.key,
   });
 
-  final Conversation conversation;
+  final dynamic conversation;
+
+  static const border = BorderSide(width: 0.3, color: Colors.grey);
 
   @override
   Widget build(BuildContext context) {
     final user = context.read<AuthenticationCubit>().state.user;
-    final conversationUser = conversation.participants
-        .extrapolateParticipantByCurrentUserId(user.id);
 
-    const border = BorderSide(width: 0.3, color: Colors.grey);
+    if (conversation is Conversation) {
+      final p2pconversation = conversation as Conversation;
 
-    final hasLastMessage = conversation.lastMessage != null;
+      final conversationUser = p2pconversation.participants
+          .extrapolateParticipantByCurrentUserId(user.id);
 
-    String senderName() {
-      // currrent user sent last message
-      if (hasLastMessage &&
-          conversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
-        return 'You';
+      final hasLastMessage = p2pconversation.lastMessage != null;
+
+      String senderName() {
+        // currrent user sent last message
+        if (hasLastMessage &&
+            p2pconversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
+          return 'You';
+        }
+        // recipient sent last message
+        return conversationUser.name!.firstword;
       }
-      // recipient sent last message
-      return conversationUser.name!.firstword;
-    }
 
-    return InkWell(
-      onTap: () => context.push(Chats.name, extra: conversationUser),
-      child: Container(
-        height: 72,
-        width: context.width,
-        padding: const EdgeInsets.only(
-          left: 9,
-          right: 8,
-        ),
-        decoration: const BoxDecoration(
-          border: Border(top: border, bottom: border),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(conversationUser.imageUrl!),
-              ),
-            ),
-            const SizedBox(
-              width: 9,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  conversationUser.name!,
-                  // style: AppTextStyles.normalTextStyleDarkGrey2,
+      return InkWell(
+        onTap: () => context.push(Chats.name, extra: conversationUser),
+        child: Container(
+          height: 72,
+          width: context.width,
+          padding: const EdgeInsets.only(
+            left: 9,
+            right: 8,
+          ),
+          decoration: const BoxDecoration(
+            border: Border(top: border, bottom: border),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(conversationUser.imageUrl!),
                 ),
-                SizedBox(
-                  width: context.width * 0.65,
-                  child: Text(
-                    hasLastMessage
-                        ? '''${senderName()}: ${conversation.lastMessage!.message}'''
-                        : 'Start a conversation',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black54,
-                      overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(
+                width: 9,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    conversationUser.name!,
+                    // style: AppTextStyles.normalTextStyleDarkGrey2,
+                  ),
+                  SizedBox(
+                    width: context.width * 0.65,
+                    child: Text(
+                      hasLastMessage
+                          ? '''${senderName()}: ${p2pconversation.lastMessage!.message}'''
+                          : 'Start a conversation',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black54,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
                     ),
-                    maxLines: 1,
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  p2pconversation.lastUpdatedAt.format,
+                  style: const TextStyle(fontSize: 12),
+                  // style: AppTextStyles.smallTextStyleGrey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      final groupConversation = conversation as GroupConversation;
+
+      final hasLastMessage = groupConversation.lastMessage != null;
+
+      final message = hasLastMessage ? groupConversation.lastMessage : null;
+
+      final conversationUser = message?.senderInfo;
+
+      return InkWell(
+        onTap: () => context.push(Chats.name, extra: conversationUser),
+        child: Container(
+          height: 72,
+          width: context.width,
+          padding: const EdgeInsets.only(
+            left: 9,
+            right: 8,
+          ),
+          decoration: const BoxDecoration(
+            border: Border(top: border, bottom: border),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: CircleAvatar(
+                  // backgroundImage: NetworkImage(''),
+                  backgroundColor: Colors.black,
+                  child: FaIcon(
+                    FontAwesomeIcons.userGroup,
+                    size: 20,
+                    color: Colors.white,
                   ),
                 ),
-              ],
-            ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                conversation.lastUpdatedAt.format,
-                style: const TextStyle(fontSize: 12),
-                // style: AppTextStyles.smallTextStyleGrey,
               ),
-            ),
-          ],
+              const SizedBox(
+                width: 9,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    groupConversation.groupName,
+                    // style: AppTextStyles.normalTextStyleDarkGrey2,
+                  ),
+                  SizedBox(
+                    width: context.width * 0.65,
+                    child: Text(
+                      hasLastMessage
+                          ? '''${conversationUser!.name!.firstword}: ${message!.message}'''
+                          : 'Be the first to start the  conversation',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black54,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  groupConversation.lastUpdatedAt.format,
+                  style: const TextStyle(fontSize: 12),
+                  // style: AppTextStyles.smallTextStyleGrey,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }
 

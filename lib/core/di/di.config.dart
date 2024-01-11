@@ -29,7 +29,9 @@ import 'package:min_chat/app/features/chat/data/chat_interface.dart' as _i12;
 import 'package:min_chat/app/features/chat/data/chat_repository.dart' as _i19;
 import 'package:min_chat/app/features/chat/data/firebase_chat_impl.dart'
     as _i13;
-import 'package:min_chat/core/di/module.dart' as _i20;
+import 'package:min_chat/app/features/chat/domain/get_conversations_use_case.dart'
+    as _i20;
+import 'package:min_chat/core/di/module.dart' as _i21;
 import 'package:min_chat/core/services/voice_recorder/record_voice_recorder.dart'
     as _i17;
 import 'package:min_chat/core/services/voice_recorder/voice_recorder.dart'
@@ -79,8 +81,10 @@ extension GetItInjectableX on _i1.GetIt {
       chatInterface: gh<_i12.IChat>(),
       userDao: gh<_i14.UserDao>(),
     ));
+    gh.singleton<_i20.GetConversationsUseCase>(_i20.GetConversationsUseCase(
+        chatRepository: gh<_i19.ChatRepository>()));
     return this;
   }
 }
 
-class _$RegisterModule extends _i20.RegisterModule {}
+class _$RegisterModule extends _i21.RegisterModule {}

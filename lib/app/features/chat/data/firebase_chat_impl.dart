@@ -224,6 +224,24 @@ class FirebaseChat implements IChat {
           );
 
   @override
+  Stream<List<GroupConversation>> groupConversationStream({
+    required String userId,
+  }) =>
+      _firebaseFirestore
+          .collection('group-conversations')
+          .where(
+           'participantsIds',
+            arrayContains: userId,
+          )
+          .orderBy('lastUpdatedAt', descending: true)
+          .snapshots()
+          .map(
+            (querySnapshot) => querySnapshot.docs
+                .map((doc) => GroupConversation.fromMap(doc.data()))
+                .toList(),
+          );
+
+  @override
   Future<List<MinChatUser>> getConversers({required String userId}) async {
     try {
       // get all conversations where current user is part of
@@ -269,7 +287,9 @@ class FirebaseChat implements IChat {
           _firebaseFirestore.collection('group-conversations').doc();
 
       // add a conversation
-      await groupConversationDoc.set(conversation.toMap());
+      await groupConversationDoc.set(
+        conversation.toMap()..addAll({'documentId': groupConversationDoc.id}),
+      );
     } catch (e) {
       throw Exception(e);
     }

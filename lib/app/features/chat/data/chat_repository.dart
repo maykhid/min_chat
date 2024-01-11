@@ -73,6 +73,11 @@ class ChatRepository {
   Stream<List<Conversation>> conversationStream({required String userId}) =>
       _chatInterface.conversationStream(userId: userId);
 
+  Stream<List<GroupConversation>> groupConversationStream({
+    required String userId,
+  }) =>
+      _chatInterface.groupConversationStream(userId: userId);
+
   Future<Result<List<MinChatUser>>> getConversers({
     required String userId,
   }) async {
