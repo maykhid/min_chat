@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:min_chat/app/features/chat/data/chat_repository.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/di/di.dart';
 import 'package:min_chat/core/utils/data_response.dart';
@@ -18,6 +19,42 @@ class SendMessageCubit extends Cubit<SendMessageState> {
     emit(const SendMessageState.processing());
     final response = await _chatRepository.sendMessage(
       message: message,
+    );
+
+    if (response.isFailure) {
+      emit(SendMessageState.failed(message: response.errorMessage));
+    } else {
+      emit(const SendMessageState.done());
+    }
+  }
+  
+  Future<void> sendGroupMessage({
+    required GroupMessage message,
+    required String id,
+  }) async {
+    emit(const SendMessageState.processing());
+    final response = await _chatRepository.sendGroupMessage(
+      message: message,
+      id: id,
+    );
+
+    if (response.isFailure) {
+      emit(SendMessageState.failed(message: response.errorMessage));
+    } else {
+      emit(const SendMessageState.done());
+    }
+  }
+
+  Future<void> sendGroupVoiceMessage({
+    required GroupMessage message,
+    required String id,
+    required String filePath,
+  }) async {
+    emit(const SendMessageState.processing());
+    final response = await _chatRepository.sendGroupVoiceMessage(
+      message: message,
+      id: id,
+      filePath: filePath,
     );
 
     if (response.isFailure) {

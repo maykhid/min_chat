@@ -7,6 +7,7 @@ import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/string_x.dart';
@@ -191,6 +192,108 @@ class FirebaseChat implements IChat {
   }
 
   @override
+  Future<void> sendGroupMessage({
+    required GroupMessage message,
+    required String id,
+  }) async {
+    try {
+      // unique docId for the group conversation
+      final docId = id;
+
+      // recipient and sender conversation document
+      final conversationDocument =
+          _firebaseFirestore.collection('group-conversations').doc(docId);
+
+      // recipient and sender messages collection
+      final messageCollection = conversationDocument.collection('messages');
+
+      final messageAsMap = message.toMap()
+        ..addAll({
+          'timestamp': Timestamp.now().millisecondsSinceEpoch,
+          'status': pendingStatusFlag,
+        });
+
+      // add new message
+      final messageRef = await messageCollection.add(
+        messageAsMap,
+      );
+
+      // update message now with status [sent]
+      await messageRef.update(
+        messageAsMap
+          ..addAll({
+            'status': sentStatusFlag,
+          }),
+      );
+
+      // update conversation lastUpdatedAt and lastMessage fields
+      await conversationDocument.update({
+        'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
+        'lastMessage': messageAsMap,
+      });
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> sendGroupVoiceMessage({
+    required GroupMessage message,
+    required String filePath,
+    required String id,
+  }) async {
+    try {
+      //  unique docId for the group conversation
+      final docId = id;
+
+      // group conversation document
+      final conversationDocument =
+          _firebaseFirestore.collection('group-conversations').doc(docId);
+
+      // recipient and sender messages collection
+      final messageCollection = conversationDocument.collection('messages');
+
+      // add timestamp and status of message
+      final messageAsMap = message.toMap()
+        ..addAll({
+          'timestamp': Timestamp.now().millisecondsSinceEpoch,
+          'status': pendingStatusFlag,
+        });
+
+      // add new message
+      final messageRef = await messageCollection.add(messageAsMap);
+
+      // ref to new audio message
+      final audioMessageRef = _firebaseStorage
+          .ref()
+          .child('voice-messages/${DateTime.now().millisecondsSinceEpoch}.m4a');
+
+      // upload new audio message
+      await audioMessageRef.putFile(File(filePath));
+
+      // get url of audio
+      final url = await audioMessageRef.getDownloadURL();
+
+      // update message now with url path and status [sent]
+      await messageRef.update(
+        messageAsMap
+          ..addAll({
+            'url': url,
+            'status': sentStatusFlag,
+          }),
+      );
+
+      // update conversation lastUpdatedAt and lastMessage fields
+      await conversationDocument.update({
+        'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
+        'lastMessage': messageAsMap,
+      });
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
   Stream<List<Message>> messageStream({
     required String recipientId,
     required String senderId,
@@ -204,6 +307,22 @@ class FirebaseChat implements IChat {
           .map(
             (snapshot) => snapshot.docs
                 .map((doc) => Message.fromMap(doc.data()))
+                .toList(),
+          );
+
+  @override
+  Stream<List<GroupMessage>> groupMessageStream({
+    required String id,
+  }) =>
+      _firebaseFirestore
+          .collection('group-conversations')
+          .doc(id)
+          .collection('messages')
+          .orderBy('timestamp')
+          .snapshots()
+          .map(
+            (snapshot) => snapshot.docs
+                .map((doc) => GroupMessage.fromMap(doc.data()))
                 .toList(),
           );
 
@@ -230,7 +349,7 @@ class FirebaseChat implements IChat {
       _firebaseFirestore
           .collection('group-conversations')
           .where(
-           'participantsIds',
+            'participantsIds',
             arrayContains: userId,
           )
           .orderBy('lastUpdatedAt', descending: true)

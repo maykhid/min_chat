@@ -13,7 +13,7 @@ class RecipientVoiceBubble extends StatefulWidget {
     super.key,
   });
 
-  final Message message;
+  final BaseMessage message;
 
   @override
   State<RecipientVoiceBubble> createState() => _RecipientVoiceBubbleState();
@@ -25,7 +25,7 @@ class _RecipientVoiceBubbleState extends State<RecipientVoiceBubble> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
 
-  late Message message;
+  late BaseMessage message;
 
   void _playPause() {
     if (_isPlaying) {

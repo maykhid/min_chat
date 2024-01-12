@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
@@ -16,29 +18,31 @@ import 'package:min_chat/app/features/chat/ui/views/widgets/sender_voice_bubble.
 import 'package:min_chat/core/utils/datetime_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
-class Chats extends StatefulWidget {
-  const Chats({required this.recipientUser, super.key});
+class GroupChatScreen extends StatefulWidget {
+  const GroupChatScreen({
+    required this.groupConversation,
+    super.key,
+  });
 
-  static const String name = '/chats';
+  static const String name = '/groupChatScreen';
 
-  final MinChatUser recipientUser;
+  final GroupConversation groupConversation;
 
   @override
-  State<Chats> createState() => _ChatsState();
+  State<GroupChatScreen> createState() => _GroupChatScreenState();
 }
 
-class _ChatsState extends State<Chats> with WidgetsBindingObserver {
-  late MinChatUser _recipientUser;
+class _GroupChatScreenState extends State<GroupChatScreen> {
+  late GroupConversation _groupConversation;
 
   @override
   void initState() {
+    _groupConversation = widget.groupConversation;
     super.initState();
-    _recipientUser = widget.recipientUser;
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<AuthenticationCubit>().state.user;
     return Stack(
       children: [
         Scaffold(
@@ -62,9 +66,14 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       const SizedBox(
                         width: 16,
                       ),
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundImage: NetworkImage(_recipientUser.imageUrl!),
+                      const CircleAvatar(
+                        // backgroundImage: NetworkImage(''),
+                        backgroundColor: Colors.black,
+                        child: FaIcon(
+                          FontAwesomeIcons.userGroup,
+                          size: 20,
+                          color: Colors.white,
+                        ),
                       ),
                       const SizedBox(
                         width: 8,
@@ -72,7 +81,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Text(
-                          _recipientUser.name!,
+                          _groupConversation.groupName,
                           // style: AppTextStyles.normalTextStyleDark,
                         ),
                       ),
@@ -84,11 +93,10 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
           ),
           body: BlocProvider<ChatCubit>(
             create: (context) => ChatCubit()
-              ..initMessageListener(
-                recipientId: _recipientUser.id,
-                senderId: user.id,
+              ..initGroupMessageListener(
+                id: _groupConversation.documentId!,
               ),
-            child: const _ChatsView(),
+            child: const _GroupChatView(),
           ),
         ),
 
@@ -96,7 +104,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
         BlocProvider<SendMessageCubit>(
           create: (context) => SendMessageCubit(),
           child: TextVoiceBoxToggler(
-            recipientId: _recipientUser.id,
+            conversationId: _groupConversation.documentId,
           ),
         ),
       ],
@@ -104,14 +112,15 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   }
 }
 
-class _ChatsView extends StatefulWidget {
-  const _ChatsView();
+class _GroupChatView extends StatefulWidget {
+  const _GroupChatView();
 
   @override
-  State<_ChatsView> createState() => _ChatsViewState();
+  State<_GroupChatView> createState() => _GroupChatViewState();
 }
 
-class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
+class _GroupChatViewState extends State<_GroupChatView>
+    with WidgetsBindingObserver {
   final controller = ScrollController();
 
   static const double customScrollExtent = 250;

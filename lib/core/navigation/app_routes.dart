@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/auth_screen.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
+import 'package:min_chat/app/features/chat/ui/views/screens/group_chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/messages_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/start_groupchat_screen.dart';
 import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
@@ -45,6 +47,17 @@ class AppRoutes {
         final minChatUser = state.extra! as MinChatUser;
         return Chats(
           recipientUser: minChatUser,
+        );
+      },
+    ),
+
+    GoRoute(
+      path: GroupChatScreen.name,
+      name: 'groupChats',
+      builder: (context, state) {
+        final groupConversation = state.extra! as GroupConversation;
+        return GroupChatScreen(
+          groupConversation: groupConversation,
         );
       },
     ),

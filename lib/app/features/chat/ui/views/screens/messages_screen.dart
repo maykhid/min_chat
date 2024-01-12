@@ -13,6 +13,7 @@ import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
+import 'package:min_chat/app/features/chat/ui/views/screens/group_chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/start_groupchat_screen.dart';
 import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
@@ -259,7 +260,8 @@ class MessagesListItem extends StatelessWidget {
       final conversationUser = message?.senderInfo;
 
       return InkWell(
-        onTap: () => context.push(Chats.name, extra: conversationUser),
+        onTap: () =>
+            context.push(GroupChatScreen.name, extra: groupConversation),
         child: Container(
           height: 72,
           width: context.width,

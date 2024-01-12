@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/text_voice_toggler_cubit/text_voice_toggler_cubit.dart';
@@ -15,12 +16,14 @@ import 'package:min_chat/core/utils/sized_context.dart';
 
 class VoiceRecorderBox extends StatefulWidget {
   const VoiceRecorderBox({
-    required this.recipientId,
-    required this.audioPlayer,
+     required this.audioPlayer, this.recipientId,
+     this.conversationId,
     super.key,
   });
 
-  final String recipientId;
+  /// A null recipientId just indirectly tells us treat as group chat
+  final String? recipientId;
+  final String? conversationId;
 
   /// AudioPlayer object is a required parameter here
   /// so that the parent widget [TextVoiceBoxToggler] can
@@ -118,6 +121,7 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
                   // controls
                   _RecorderControls(
                     recipientId: widget.recipientId,
+                    conversationId: widget.conversationId,
                   ),
                 ],
               ),
@@ -132,9 +136,11 @@ class _VoiceRecorderBoxState extends State<VoiceRecorderBox> {
 class _RecorderControls extends StatefulWidget {
   const _RecorderControls({
     required this.recipientId,
+    required this.conversationId,
   });
-
-  final String recipientId;
+  // A null recipientId just indirectly tells us that this is a group chat
+  final String? recipientId;
+  final String? conversationId;
 
   @override
   State<_RecorderControls> createState() => _RecorderControlsState();
@@ -185,12 +191,26 @@ class _RecorderControlsState extends State<_RecorderControls> {
             state is! PlaybackCompleteState &&
             state is! PlaybackStoppedState;
 
-        final message = Message(
-          senderId: user.id,
-          recipientId: widget.recipientId,
-          message: '🎵 Audio',
-          messageType: audioMessageFlag,
-        );
+        BaseMessage message;
+
+        final isGroupChat = widget.recipientId == null;
+
+        if (widget.recipientId != null) {
+          message = Message(
+            senderId: user.id,
+            recipientId: widget.recipientId!,
+            message: '🎵 Audio',
+            messageType: audioMessageFlag,
+          );
+        } else {
+          message = GroupMessage(
+            senderId: user.id,
+            recipientId: '',
+            message: '🎵 Audio',
+            senderInfo: user,
+            messageType: audioMessageFlag,
+          );
+        }
 
         return Container(
           height: 100,
@@ -214,11 +234,13 @@ class _RecorderControlsState extends State<_RecorderControls> {
                     voiceCubit.stopRecording().then(
                           (_) => _sendVoiceNote(
                             message: message,
+                            isGroupChat: isGroupChat,
                           ),
                         );
                   } else {
                     _sendVoiceNote(
                       message: message,
+                      isGroupChat: isGroupChat,
                     );
                   }
                 },
@@ -250,13 +272,23 @@ class _RecorderControlsState extends State<_RecorderControls> {
   }
 
   void _sendVoiceNote({
-    required Message message,
+    required BaseMessage message,
+    required bool isGroupChat,
   }) {
     _playToneOnSendRecord();
-    sendMessageCubit.sendVoiceMessage(
-      message: message,
-      filePath: voiceCubit.path!,
-    );
+
+    if (isGroupChat) {
+      sendMessageCubit.sendVoiceMessage(
+        message: message as Message,
+        filePath: voiceCubit.path!,
+      );
+    } else {
+      sendMessageCubit.sendGroupVoiceMessage(
+        message: message as GroupMessage,
+        filePath: voiceCubit.path!,
+        id: widget.conversationId!,
+      );
+    }
 
     textVoiceTogglerCubit.textVoiceToggle();
   }

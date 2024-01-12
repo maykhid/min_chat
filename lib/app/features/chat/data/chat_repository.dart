@@ -4,6 +4,7 @@ import 'package:min_chat/app/features/auth/data/user_dao.dart';
 import 'package:min_chat/app/features/chat/data/chat_interface.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/data/model/result.dart';
 
@@ -46,6 +47,21 @@ class ChatRepository {
     }
   }
 
+  Future<Result<void>> sendGroupMessage({
+    required GroupMessage message,
+    required String id,
+  }) async {
+    try {
+      final response = await _chatInterface.sendGroupMessage(
+        message: message,
+        id: id,
+      );
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(errorMessage: e.toString());
+    }
+  }
+
   Future<Result<void>> sendVoiceMessage({
     required Message message,
     required String filePath,
@@ -61,6 +77,23 @@ class ChatRepository {
     }
   }
 
+  Future<Result<void>> sendGroupVoiceMessage({
+    required GroupMessage message,
+    required String filePath,
+    required String id,
+  }) async {
+    try {
+      final response = await _chatInterface.sendGroupVoiceMessage(
+        message: message,
+        filePath: filePath,
+        id: id,
+      );
+      return Result.success(response);
+    } catch (e) {
+      return Result.failure(errorMessage: e.toString());
+    }
+  }
+
   Stream<List<Message>> messageStream({
     required String recipientId,
     required String senderId,
@@ -68,6 +101,13 @@ class ChatRepository {
       _chatInterface.messageStream(
         senderId: senderId,
         recipientId: recipientId,
+      );
+
+  Stream<List<GroupMessage>> groupMessageStream({
+    required String id,
+  }) =>
+      _chatInterface.groupMessageStream(
+        id: id,
       );
 
   Stream<List<Conversation>> conversationStream({required String userId}) =>

@@ -9,7 +9,7 @@ class SenderChatBubble extends StatelessWidget {
     super.key,
   });
 
-  final Message message;
+  final BaseMessage message;
 
   @override
   Widget build(BuildContext context) {

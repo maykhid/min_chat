@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:min_chat/app/features/chat/data/chat_repository.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/core/di/di.dart';
 
@@ -19,13 +20,30 @@ class ChatCubit extends Cubit<ChatState> {
         .listen(updateChats)
         .onError(
           (_) => updateError(
-            '''Error: Payload validation failed. Check for issues with data types, missing fields, or incorrect values in your payload.''',
+            '''Error: An error occured on message stream''',
+          ),
+        );
+  }
+
+  void initGroupMessageListener({
+    required String id,
+  }) {
+    _chatRepository.groupMessageStream(id: id).listen(updateGroupChats).onError(
+          (_) => updateError(
+            '''Error: An error occured on message stream''',
           ),
         );
   }
 
   void updateChats(List<Message> chats) {
     if (!isClosed) {
+      emit(ChatState(chats: chats));
+    }
+  }
+
+  void updateGroupChats(List<GroupMessage> chats) {
+    if (!isClosed) {
+      print(chats.runtimeType);
       emit(ChatState(chats: chats));
     }
   }
@@ -46,12 +64,12 @@ class ChatState {
   factory ChatState.empty() => ChatState(chats: []);
   factory ChatState.withError(
     String errorMessage,
-    List<Message> chats,
+    List<BaseMessage> chats,
   ) =>
       ChatState(chats: chats, errorMessage: errorMessage);
 
   bool get hasError => errorMessage != null;
 
-  final List<Message> chats;
+  final List<BaseMessage> chats;
   final String? errorMessage;
 }
