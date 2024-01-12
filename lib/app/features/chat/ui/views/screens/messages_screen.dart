@@ -259,6 +259,16 @@ class MessagesListItem extends StatelessWidget {
 
       final conversationUser = message?.senderInfo;
 
+      String senderName() {
+        // currrent user sent last message
+        if (hasLastMessage &&
+            groupConversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
+          return 'You';
+        }
+        // recipient sent last message
+        return conversationUser!.name!.firstword;
+      }
+
       return InkWell(
         onTap: () =>
             context.push(GroupChatScreen.name, extra: groupConversation),
@@ -301,8 +311,8 @@ class MessagesListItem extends StatelessWidget {
                     width: context.width * 0.65,
                     child: Text(
                       hasLastMessage
-                          ? '''${conversationUser!.name!.firstword}: ${message!.message}'''
-                          : 'Be the first to start the  conversation',
+                          ? '''${senderName()}: ${message!.message}'''
+                          : 'Be the first to start the conversation',
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,

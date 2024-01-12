@@ -277,7 +277,7 @@ class _RecorderControlsState extends State<_RecorderControls> {
   }) {
     _playToneOnSendRecord();
 
-    if (isGroupChat) {
+    if (!isGroupChat) {
       sendMessageCubit.sendVoiceMessage(
         message: message as Message,
         filePath: voiceCubit.path!,
