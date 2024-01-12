@@ -43,7 +43,6 @@ class ChatCubit extends Cubit<ChatState> {
 
   void updateGroupChats(List<GroupMessage> chats) {
     if (!isClosed) {
-      print(chats.runtimeType);
       emit(ChatState(chats: chats));
     }
   }

@@ -268,7 +268,7 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
                       child: RecipientVoiceBubble(
-                        message: chats[index],
+                        message: chats[index] as Message,
                       ),
                     );
                   }
@@ -299,7 +299,7 @@ class _ChatsViewState extends State<_ChatsView> with WidgetsBindingObserver {
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: RecipientVoiceBubble(
-            message: chats[index],
+            message: chats[index] as Message,
           ),
         ),
       ],

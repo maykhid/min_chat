@@ -266,8 +266,8 @@ class _GroupChatViewState extends State<_GroupChatView>
                   if (isTextMessage) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: RecipientChatBubble(
-                        message: chats[index],
+                      child: GroupRecipientChatBubble(
+                        message: chats[index] as GroupMessage,
                       ),
                     );
                   }
@@ -276,8 +276,8 @@ class _GroupChatViewState extends State<_GroupChatView>
                   else if (isAudioMessage) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: RecipientVoiceBubble(
-                        message: chats[index],
+                      child: GroupRecipientVoiceBubble(
+                        message: chats[index] as GroupMessage,
                       ),
                     );
                   }
@@ -296,19 +296,21 @@ class _GroupChatViewState extends State<_GroupChatView>
     List<BaseMessage> chats,
     int index,
   ) {
+    // final chat = chats[index] as GroupMessage;
+    
     return [
       if (isText) ...[
         Padding(
           padding: const EdgeInsets.only(top: 5),
-          child: RecipientChatBubble(
-            message: chats[index],
+          child: GroupRecipientChatBubble(
+            message: chats[index] as GroupMessage,
           ),
         ),
       ] else ...[
         Padding(
           padding: const EdgeInsets.only(top: 5),
-          child: RecipientVoiceBubble(
-            message: chats[index],
+          child: GroupRecipientVoiceBubble(
+            message: chats[index] as GroupMessage,
           ),
         ),
       ],
