@@ -45,7 +45,13 @@ class StartGroupchatCubit extends Cubit<StartGroupchatState> {
     if (response.isFailure) {
       emit(ErrorState(state.conversers, errorMessage: response.errorMessage));
     } else {
-      emit(GroupChatCreatedState(state.conversers));
+     
+      emit(
+        GroupChatCreatedState(
+          state.conversers,
+          groupConversation: response.data!,
+        ),
+      );
     }
   }
 }

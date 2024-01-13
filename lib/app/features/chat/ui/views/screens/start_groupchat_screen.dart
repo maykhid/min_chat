@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_groupchat_cubit/start_groupchat_cubit.dart';
+import 'package:min_chat/app/features/chat/ui/views/screens/group_chat_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/app/shared/ui/app_text_field.dart';
@@ -47,7 +49,7 @@ class _StartGroupchatScreenState extends State<StartGroupchatScreen> {
           listener: (context, state) {
             if (state is ErrorState) {
               // error message display
-            } 
+            }
           },
           builder: (context, state) {
             final selectedUsers =
@@ -247,9 +249,12 @@ class _EnterGroupNameWidgetState extends State<EnterGroupNameWidget> {
                 BlocConsumer<StartGroupchatCubit, StartGroupchatState>(
                   listener: (context, state) {
                     if (state is GroupChatCreatedState) {
-                      // context
-                      //   ..pop() // remove dialog
-                      //   ..push('');
+                      context
+                        ..pop() // pop dialog
+                        ..pushReplacement(
+                          GroupChatScreen.name,
+                          extra: state.groupConversation,
+                        );
                     } else if (state is ErrorState) {
                       toastification.show(
                         context: context,

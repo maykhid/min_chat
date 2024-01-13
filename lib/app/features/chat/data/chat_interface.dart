@@ -6,13 +6,13 @@ import 'package:min_chat/app/features/chat/data/model/message.dart';
 
 abstract class IChat {
   /// Start chat with this [recipientMIdOrEmail]
-  Future<MinChatUser> startConversation({
+  Future<Conversation> startConversation({
     required String recipientMIdOrEmail,
     required MinChatUser currentUser,
   });
 
   /// Send a text message
-  Future<void> sendMessage({required Message message});
+  Future<void> sendMessage({required Message message, required String id});
 
   /// Send a group text message
   Future<void> sendGroupMessage({
@@ -31,12 +31,12 @@ abstract class IChat {
   Future<void> sendVoiceMessage({
     required Message message,
     required String filePath,
+     required String id,
   });
 
   /// A Stream of messages for a particular [Conversation]
   Stream<List<Message>> messageStream({
-    required String recipientId,
-    required String senderId,
+    required String id,
   });
 
   /// A Stream of messages for a particular [Conversation]
@@ -56,7 +56,7 @@ abstract class IChat {
   Future<List<MinChatUser>> getConversers({required String userId});
 
   /// Start a group conversation
-  Future<void> startAGroupConversation({
+  Future<GroupConversation> startAGroupConversation({
     required GroupConversation conversation,
   });
 }

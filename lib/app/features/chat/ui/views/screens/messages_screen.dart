@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
@@ -178,6 +179,9 @@ class MessagesListItem extends StatelessWidget {
 
       final hasLastMessage = p2pconversation.lastMessage != null;
 
+      final message =
+          hasLastMessage ? p2pconversation.lastMessage! as Message : null;
+
       String senderName() {
         // currrent user sent last message
         if (hasLastMessage &&
@@ -189,7 +193,7 @@ class MessagesListItem extends StatelessWidget {
       }
 
       return InkWell(
-        onTap: () => context.push(Chats.name, extra: conversationUser),
+        onTap: () => context.push(Chats.name, extra: p2pconversation),
         child: Container(
           height: 72,
           width: context.width,
@@ -223,7 +227,7 @@ class MessagesListItem extends StatelessWidget {
                     width: context.width * 0.65,
                     child: Text(
                       hasLastMessage
-                          ? '''${senderName()}: ${p2pconversation.lastMessage!.message}'''
+                          ? '''${senderName()}: ${message?.message}'''
                           : 'Start a conversation',
                       style: const TextStyle(
                         fontSize: 11,
@@ -255,7 +259,9 @@ class MessagesListItem extends StatelessWidget {
 
       final hasLastMessage = groupConversation.lastMessage != null;
 
-      final message = hasLastMessage ? groupConversation.lastMessage : null;
+      final message = hasLastMessage
+          ? groupConversation.lastMessage! as GroupMessage
+          : null;
 
       final conversationUser = message?.senderInfo;
 
@@ -311,7 +317,7 @@ class MessagesListItem extends StatelessWidget {
                     width: context.width * 0.65,
                     child: Text(
                       hasLastMessage
-                          ? '''${senderName()}: ${message!.message}'''
+                          ? '''${senderName()}: ${message?.message}'''
                           : 'Be the first to start the conversation',
                       style: const TextStyle(
                         fontSize: 11,
@@ -373,7 +379,7 @@ class _StartConversationWidgetState extends State<StartConversationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<AuthenticationCubit>().state.user;
+    // final user = context.read<AuthenticationCubit>().state.user;
 
     late String midOrEmail;
 
@@ -384,7 +390,6 @@ class _StartConversationWidgetState extends State<StartConversationWidget> {
         focusNode.unfocus();
         cubit.startConversation(
           recipientMIdOrEmail: midOrEmail,
-          senderMid: user.mID!,
         );
       }
     }

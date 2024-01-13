@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
@@ -15,10 +16,16 @@ import 'package:min_chat/app/features/chat/ui/views/widgets/voice_recorder_box.d
 import 'package:min_chat/core/utils/sized_context.dart';
 
 class TextVoiceBoxToggler extends StatefulWidget {
-  const TextVoiceBoxToggler({this.recipientId, this.conversationId, super.key});
+  const TextVoiceBoxToggler({
+    required this.conversation,
+    this.recipientId,
+    super.key,
+  });
 
+  final BaseConversation conversation;
+  /// A null [recipientId] typically means this is a group conversation
+  /// and should be treated as such
   final String? recipientId;
-  final String? conversationId;
 
   @override
   State<TextVoiceBoxToggler> createState() => _TextVoiceBoxTogglerState();
@@ -26,6 +33,13 @@ class TextVoiceBoxToggler extends StatefulWidget {
 
 class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  late BaseConversation conversation;
+
+  @override
+  void initState() {
+    conversation = widget.conversation;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -59,13 +73,13 @@ class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
             child: isShowingTextBox
                 ? MessagingTextBox(
                     recipientId: widget.recipientId,
-                    conversationId: widget.conversationId,
+                    conversationId: conversation.documentId!,
                   )
                 : Align(
                     alignment: Alignment.bottomCenter,
                     child: VoiceRecorderBox(
                       recipientId: widget.recipientId,
-                      conversationId: widget.conversationId,
+                      conversationId: conversation.documentId,
                       audioPlayer: _audioPlayer,
                     ),
                   ),
@@ -89,10 +103,14 @@ class _TextVoiceBoxTogglerState extends State<TextVoiceBoxToggler> {
 }
 
 class MessagingTextBox extends StatefulWidget {
-  const MessagingTextBox({this.recipientId, this.conversationId, super.key});
+  const MessagingTextBox({
+    required this.conversationId,
+    this.recipientId,
+    super.key,
+  });
 
   final String? recipientId;
-  final String? conversationId;
+  final String conversationId;
 
   @override
   State<MessagingTextBox> createState() => _MessagingTextBoxState();
@@ -102,7 +120,7 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
     with WidgetsBindingObserver {
   double _bottomOffset = 50;
   late String? _recipientId;
-  late String? _conversationId;
+  late String _conversationId;
 
   final _textController = TextEditingController();
   bool _showRecordingIcon = false;
@@ -170,6 +188,7 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
               message: _textController.text,
               messageType: textMessageFlag,
             ),
+            id: _conversationId,
           );
         } else {
           sendMessageCubit.sendGroupMessage(
@@ -180,7 +199,7 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
               senderInfo: user,
               messageType: textMessageFlag,
             ),
-            id: _conversationId!,
+            id: _conversationId,
           );
         }
 

@@ -22,7 +22,11 @@ final class CreatingGroupChatState extends StartGroupchatState {
 }
 
 final class GroupChatCreatedState extends StartGroupchatState {
-  const GroupChatCreatedState(super.conversers);
+  const GroupChatCreatedState(
+    super.conversers, {
+    required this.groupConversation,
+  });
+  final GroupConversation groupConversation;
 }
 
 class ErrorState extends StartGroupchatState {

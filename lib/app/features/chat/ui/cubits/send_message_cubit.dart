@@ -15,10 +15,12 @@ class SendMessageCubit extends Cubit<SendMessageState> {
 
   Future<void> sendMessage({
     required Message message,
+    required String id,
   }) async {
     emit(const SendMessageState.processing());
     final response = await _chatRepository.sendMessage(
       message: message,
+      id: id,
     );
 
     if (response.isFailure) {
@@ -27,7 +29,7 @@ class SendMessageCubit extends Cubit<SendMessageState> {
       emit(const SendMessageState.done());
     }
   }
-  
+
   Future<void> sendGroupMessage({
     required GroupMessage message,
     required String id,
@@ -67,11 +69,13 @@ class SendMessageCubit extends Cubit<SendMessageState> {
   Future<void> sendVoiceMessage({
     required Message message,
     required String filePath,
+    required String id,
   }) async {
     emit(const SendMessageState.processing());
     final response = await _chatRepository.sendVoiceMessage(
       message: message,
       filePath: filePath,
+      id: id,
     );
 
     if (response.isFailure) {
