@@ -11,7 +11,7 @@ class GetConversationsUseCase {
 
   final ChatRepository _chatRepository;
 
-  Stream<List<dynamic>> conversationStreams({
+  Stream<List<BaseConversation>> conversationStreams({
     required String userId,
   }) {
     final conversationStream =

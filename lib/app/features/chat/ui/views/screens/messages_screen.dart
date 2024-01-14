@@ -163,7 +163,7 @@ class MessagesListItem extends StatelessWidget {
     super.key,
   });
 
-  final dynamic conversation;
+  final BaseConversation conversation;
 
   static const border = BorderSide(width: 0.3, color: Colors.grey);
 
@@ -184,8 +184,7 @@ class MessagesListItem extends StatelessWidget {
 
       String senderName() {
         // currrent user sent last message
-        if (hasLastMessage &&
-            p2pconversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
+        if (hasLastMessage && message!.isMessageFromCurrentUser(user.id)) {
           return 'You';
         }
         // recipient sent last message
@@ -197,10 +196,7 @@ class MessagesListItem extends StatelessWidget {
         child: Container(
           height: 72,
           width: context.width,
-          padding: const EdgeInsets.only(
-            left: 9,
-            right: 8,
-          ),
+          padding: _padding,
           decoration: const BoxDecoration(
             border: Border(top: border, bottom: border),
           ),
@@ -229,13 +225,7 @@ class MessagesListItem extends StatelessWidget {
                       hasLastMessage
                           ? '''${senderName()}: ${message?.message}'''
                           : 'Start a conversation',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.black54,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      style: _lastMessageTextStyle,
                       maxLines: 1,
                     ),
                   ),
@@ -267,8 +257,7 @@ class MessagesListItem extends StatelessWidget {
 
       String senderName() {
         // currrent user sent last message
-        if (hasLastMessage &&
-            groupConversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
+        if (hasLastMessage && message!.isMessageFromCurrentUser(user.id)) {
           return 'You';
         }
         // recipient sent last message
@@ -281,10 +270,7 @@ class MessagesListItem extends StatelessWidget {
         child: Container(
           height: 72,
           width: context.width,
-          padding: const EdgeInsets.only(
-            left: 9,
-            right: 8,
-          ),
+          padding: _padding,
           decoration: const BoxDecoration(
             border: Border(top: border, bottom: border),
           ),
@@ -319,13 +305,7 @@ class MessagesListItem extends StatelessWidget {
                       hasLastMessage
                           ? '''${senderName()}: ${message?.message}'''
                           : 'Be the first to start the conversation',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.black54,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      style: _lastMessageTextStyle,
                       maxLines: 1,
                     ),
                   ),
@@ -345,6 +325,23 @@ class MessagesListItem extends StatelessWidget {
         ),
       );
     }
+  }
+
+  TextStyle get _lastMessageTextStyle {
+    return const TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      fontStyle: FontStyle.italic,
+      color: Colors.black54,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  EdgeInsets get _padding {
+    return const EdgeInsets.only(
+      left: 9,
+      right: 8,
+    );
   }
 }
 
