@@ -1,14 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
+import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 
-/// classes that 
-abstract class SortableConversation {
-  DateTime get lastUpdatedAt;
-}
-
-class Conversation extends SortableConversation with EquatableMixin {
-  Conversation({
+/// classes that
+abstract class BaseConversation {
+  BaseConversation({
     required this.participants,
     required this.initiatedBy,
     required this.initiatedAt,
@@ -16,6 +13,41 @@ class Conversation extends SortableConversation with EquatableMixin {
     this.participantsIds,
     this.lastMessage,
     this.documentId,
+  });
+
+  factory BaseConversation.fromMap(Map<String, dynamic> map) {
+    if (map['groupName'] != null) {
+      return GroupConversation.fromMap(map);
+    }
+    return Conversation.fromMap(map);
+  }
+
+  final List<MinChatUser> participants;
+  final String initiatedBy;
+  final DateTime initiatedAt;
+  final DateTime lastUpdatedAt;
+  final List<String>? participantsIds;
+  final BaseMessage? lastMessage;
+  final String? documentId;
+
+  // Abstract method to be implemented by subclasses
+  Map<String, dynamic> toMap();
+
+  // Method to be overridden by subclasses to include extra information
+  Map<String, dynamic> additionalInfo() {
+    return {};
+  }
+}
+
+class Conversation extends BaseConversation with EquatableMixin {
+  Conversation({
+    required super.participants,
+    required super.initiatedBy,
+    required super.initiatedAt,
+    required super.lastUpdatedAt,
+    super.participantsIds,
+    super.lastMessage,
+    super.documentId,
   });
 
   factory Conversation.fromMap(Map<String, dynamic> data) {
@@ -43,24 +75,18 @@ class Conversation extends SortableConversation with EquatableMixin {
     );
   }
 
-  final List<MinChatUser> participants;
-  final String initiatedBy;
-  final DateTime initiatedAt;
   @override
-  final DateTime lastUpdatedAt;
-  final List<String>? participantsIds;
-  final Message? lastMessage;
-  final String? documentId;
-
   Map<String, dynamic> toMap() {
-    return {
+    final baseMap = {
       'initiatedAt': initiatedAt.millisecondsSinceEpoch,
       'initiatedBy': initiatedBy,
       'participants': participants.map((user) => user.toMap()).toList(),
       'lastUpdatedAt': lastUpdatedAt.millisecondsSinceEpoch,
       'participantsIds': participantsIds,
+      'documentId': documentId,
       'lastMessage': lastMessage?.toMap(),
     };
+    return {...baseMap, ...additionalInfo()};
   }
 
   @override

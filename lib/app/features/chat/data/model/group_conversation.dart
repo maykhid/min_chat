@@ -1,16 +1,18 @@
 import 'package:equatable/equatable.dart';
+import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 
-class GroupConversation extends SortableConversation with EquatableMixin{
+class GroupConversation extends BaseConversation with EquatableMixin {
   GroupConversation({
-    required this.initiatedBy,
-    required this.initiatedAt,
-    required this.lastUpdatedAt,
+    required super.initiatedBy,
+    required super.initiatedAt,
+    required super.lastUpdatedAt,
     required this.groupName,
-    required this.participantsIds,
-    this.documentId,
-    this.lastMessage,
+    required super.participantsIds,
+    super.participants = const <MinChatUser>[],
+    super.documentId,
+    super.lastMessage,
   });
 
   factory GroupConversation.fromMap(Map<String, dynamic> data) {
@@ -32,17 +34,11 @@ class GroupConversation extends SortableConversation with EquatableMixin{
     );
   }
 
-  final String initiatedBy;
-  final DateTime initiatedAt;
-  @override
-  final DateTime lastUpdatedAt;
-  final List<String> participantsIds;
   final String groupName;
-  final GroupMessage? lastMessage;
-  final String? documentId;
 
+  @override
   Map<String, dynamic> toMap() {
-    return {
+    final baseMap = {
       'initiatedBy': initiatedBy,
       'initiatedAt': initiatedAt.millisecondsSinceEpoch,
       'lastUpdatedAt': lastUpdatedAt.millisecondsSinceEpoch,
@@ -51,9 +47,17 @@ class GroupConversation extends SortableConversation with EquatableMixin{
       'documentId': documentId,
       'lastMessage': lastMessage?.toMap(),
     };
+    return baseMap;
   }
-  
+
   @override
-  // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [
+        participantsIds,
+        initiatedAt,
+        initiatedBy,
+        lastUpdatedAt,
+        lastMessage,
+        groupName,
+        documentId,
+      ];
 }

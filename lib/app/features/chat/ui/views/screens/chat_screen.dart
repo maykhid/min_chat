@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/chat_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/send_message_cubit.dart';
@@ -14,31 +14,34 @@ import 'package:min_chat/app/features/chat/ui/views/widgets/recipient_voice_bubb
 import 'package:min_chat/app/features/chat/ui/views/widgets/sender_chat_bubble.dart';
 import 'package:min_chat/app/features/chat/ui/views/widgets/sender_voice_bubble.dart';
 import 'package:min_chat/core/utils/datetime_x.dart';
+import 'package:min_chat/core/utils/participants_x.dart';
 import 'package:min_chat/core/utils/sized_context.dart';
 
 class Chats extends StatefulWidget {
-  const Chats({required this.recipientUser, super.key});
+  const Chats({required this.conversation, super.key});
 
   static const String name = '/chats';
 
-  final MinChatUser recipientUser;
+  final Conversation conversation;
 
   @override
   State<Chats> createState() => _ChatsState();
 }
 
 class _ChatsState extends State<Chats> with WidgetsBindingObserver {
-  late MinChatUser _recipientUser;
+  late Conversation _conversation;
 
   @override
   void initState() {
     super.initState();
-    _recipientUser = widget.recipientUser;
+    _conversation = widget.conversation;
   }
 
   @override
   Widget build(BuildContext context) {
     final user = context.read<AuthenticationCubit>().state.user;
+    final recipientUser = _conversation.participants
+        .extrapolateParticipantByCurrentUserId(user.id);
     return Stack(
       children: [
         Scaffold(
@@ -64,7 +67,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       ),
                       CircleAvatar(
                         radius: 16,
-                        backgroundImage: NetworkImage(_recipientUser.imageUrl!),
+                        backgroundImage: NetworkImage(recipientUser.imageUrl!),
                       ),
                       const SizedBox(
                         width: 8,
@@ -72,7 +75,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Text(
-                          _recipientUser.name!,
+                          recipientUser.name!,
                           // style: AppTextStyles.normalTextStyleDark,
                         ),
                       ),
@@ -85,8 +88,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
           body: BlocProvider<ChatCubit>(
             create: (context) => ChatCubit()
               ..initMessageListener(
-                recipientId: _recipientUser.id,
-                senderId: user.id,
+                id: _conversation.documentId!,
               ),
             child: const _ChatsView(),
           ),
@@ -95,8 +97,10 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
         // messageing text box
         BlocProvider<SendMessageCubit>(
           create: (context) => SendMessageCubit(),
+          // for a normal chat the recipient id IS needed
           child: TextVoiceBoxToggler(
-            recipientId: _recipientUser.id,
+            recipientId: recipientUser.id,
+            conversation: _conversation,
           ),
         ),
       ],

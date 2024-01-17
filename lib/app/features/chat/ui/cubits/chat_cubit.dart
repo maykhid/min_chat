@@ -12,11 +12,10 @@ class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _chatRepository;
 
   void initMessageListener({
-    required String recipientId,
-    required String senderId,
+    required String id,
   }) {
     _chatRepository
-        .messageStream(recipientId: recipientId, senderId: senderId)
+        .messageStream(id: id)
         .listen(updateChats)
         .onError(
           (_) => updateError(

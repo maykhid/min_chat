@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:min_chat/app/features/auth/data/model/authenticated_user.dart';
 import 'package:min_chat/app/features/chat/data/chat_repository.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/core/di/di.dart';
 import 'package:min_chat/core/utils/data_response.dart';
 
@@ -14,12 +14,10 @@ class StartConversationCubit extends Cubit<StartConversationState> {
 
   Future<void> startConversation({
     required String recipientMIdOrEmail,
-    required String senderMid,
   }) async {
     emit(const StartConversationState.processing());
     final response = await _chatRepository.startConversation(
       recipientMIdOrEmail: recipientMIdOrEmail,
-      senderMId: senderMid,
     );
 
     if (response.isFailure) {
@@ -36,7 +34,7 @@ class StartConversationState extends Equatable {
   const StartConversationState.processing()
       : this._(status: DataResponseStatus.processing);
 
-  const StartConversationState.done({required MinChatUser response})
+  const StartConversationState.done({required Conversation response})
       : this._(
           status: DataResponseStatus.success,
           response: response,
@@ -52,7 +50,7 @@ class StartConversationState extends Equatable {
   });
 
   final DataResponseStatus status;
-  final MinChatUser? response;
+  final Conversation? response;
   final String? message;
 
   @override

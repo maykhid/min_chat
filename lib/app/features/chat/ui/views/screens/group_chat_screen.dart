@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -103,8 +102,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         // messageing text box
         BlocProvider<SendMessageCubit>(
           create: (context) => SendMessageCubit(),
+            // for a group chat the recipient id IS NOT needed
           child: TextVoiceBoxToggler(
-            conversationId: _groupConversation.documentId,
+            conversation: _groupConversation,
           ),
         ),
       ],

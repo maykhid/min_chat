@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/domain/get_conversations_use_case.dart';
 import 'package:min_chat/core/di/di.dart';
 
@@ -21,7 +22,7 @@ class MessagesCubit extends Cubit<MessagesState> {
         );
   }
 
-  void updateConversation(List<dynamic> conversations) {
+  void updateConversation(List<BaseConversation> conversations) {
     // print(conversations);
     // final currentState = state;
     // final updatedConversations = currentState.conversations
@@ -48,12 +49,12 @@ class MessagesState {
   factory MessagesState.empty() => MessagesState(conversations: []);
   factory MessagesState.withError(
     String errorMessage,
-    List<dynamic> conversations,
+    List<BaseConversation> conversations,
   ) =>
       MessagesState(conversations: conversations, errorMessage: errorMessage);
 
   bool get hasError => errorMessage != null;
 
-  final List<dynamic> conversations;
+  final List<BaseConversation> conversations;
   final String? errorMessage;
 }

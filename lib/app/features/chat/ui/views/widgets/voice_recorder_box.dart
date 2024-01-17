@@ -16,8 +16,9 @@ import 'package:min_chat/core/utils/sized_context.dart';
 
 class VoiceRecorderBox extends StatefulWidget {
   const VoiceRecorderBox({
-     required this.audioPlayer, this.recipientId,
-     this.conversationId,
+    required this.audioPlayer,
+    this.recipientId,
+    this.conversationId,
     super.key,
   });
 
@@ -26,7 +27,7 @@ class VoiceRecorderBox extends StatefulWidget {
   final String? conversationId;
 
   /// AudioPlayer object is a required parameter here
-  /// so that the parent widget [TextVoiceBoxToggler] can
+  /// so that the parent widget TextVoiceBoxToggler can
   /// handle it's [AudioPlayer] disposal.
   final AudioPlayer audioPlayer;
 
@@ -281,6 +282,7 @@ class _RecorderControlsState extends State<_RecorderControls> {
       sendMessageCubit.sendVoiceMessage(
         message: message as Message,
         filePath: voiceCubit.path!,
+        id: widget.conversationId!,
       );
     } else {
       sendMessageCubit.sendGroupVoiceMessage(

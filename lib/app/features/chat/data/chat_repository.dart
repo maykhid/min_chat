@@ -19,9 +19,9 @@ class ChatRepository {
   final IChat _chatInterface;
   final UserDao _userDao;
 
-  Future<Result<MinChatUser>> startConversation({
+  Future<Result<Conversation>> startConversation({
     required String recipientMIdOrEmail,
-    required String senderMId,
+    
   }) async {
     try {
       final response = await _chatInterface.startConversation(
@@ -36,10 +36,12 @@ class ChatRepository {
 
   Future<Result<void>> sendMessage({
     required Message message,
+    required String id,
   }) async {
     try {
       final response = await _chatInterface.sendMessage(
         message: message,
+        id: id,
       );
       return Result.success(response);
     } catch (e) {
@@ -65,11 +67,13 @@ class ChatRepository {
   Future<Result<void>> sendVoiceMessage({
     required Message message,
     required String filePath,
+    required String id,
   }) async {
     try {
       final response = await _chatInterface.sendVoiceMessage(
         message: message,
         filePath: filePath,
+        id: id,
       );
       return Result.success(response);
     } catch (e) {
@@ -95,12 +99,10 @@ class ChatRepository {
   }
 
   Stream<List<Message>> messageStream({
-    required String recipientId,
-    required String senderId,
+    required String id,
   }) =>
       _chatInterface.messageStream(
-        senderId: senderId,
-        recipientId: recipientId,
+        id: id,
       );
 
   Stream<List<GroupMessage>> groupMessageStream({
@@ -129,7 +131,7 @@ class ChatRepository {
     }
   }
 
-  Future<Result<void>> startAGroupConversation({
+  Future<Result<GroupConversation>> startAGroupConversation({
     required GroupConversation conversation,
   }) async {
     try {

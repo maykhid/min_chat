@@ -35,6 +35,11 @@ abstract class BaseMessage {
   Map<String, dynamic> additionalInfo() {
     return {};
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 class Message extends BaseMessage {

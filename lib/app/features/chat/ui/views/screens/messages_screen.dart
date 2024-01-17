@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
 import 'package:min_chat/app/features/chat/data/model/conversation.dart';
 import 'package:min_chat/app/features/chat/data/model/group_conversation.dart';
+import 'package:min_chat/app/features/chat/data/model/group_message.dart';
 import 'package:min_chat/app/features/chat/data/model/message.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/messages_cubit.dart';
 import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.dart';
@@ -162,7 +163,7 @@ class MessagesListItem extends StatelessWidget {
     super.key,
   });
 
-  final dynamic conversation;
+  final BaseConversation conversation;
 
   static const border = BorderSide(width: 0.3, color: Colors.grey);
 
@@ -178,10 +179,12 @@ class MessagesListItem extends StatelessWidget {
 
       final hasLastMessage = p2pconversation.lastMessage != null;
 
+      final message =
+          hasLastMessage ? p2pconversation.lastMessage! as Message : null;
+
       String senderName() {
         // currrent user sent last message
-        if (hasLastMessage &&
-            p2pconversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
+        if (hasLastMessage && message!.isMessageFromCurrentUser(user.id)) {
           return 'You';
         }
         // recipient sent last message
@@ -189,14 +192,11 @@ class MessagesListItem extends StatelessWidget {
       }
 
       return InkWell(
-        onTap: () => context.push(Chats.name, extra: conversationUser),
+        onTap: () => context.push(Chats.name, extra: p2pconversation),
         child: Container(
           height: 72,
           width: context.width,
-          padding: const EdgeInsets.only(
-            left: 9,
-            right: 8,
-          ),
+          padding: _padding,
           decoration: const BoxDecoration(
             border: Border(top: border, bottom: border),
           ),
@@ -223,15 +223,9 @@ class MessagesListItem extends StatelessWidget {
                     width: context.width * 0.65,
                     child: Text(
                       hasLastMessage
-                          ? '''${senderName()}: ${p2pconversation.lastMessage!.message}'''
+                          ? '''${senderName()}: ${message?.message}'''
                           : 'Start a conversation',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.black54,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      style: _lastMessageTextStyle,
                       maxLines: 1,
                     ),
                   ),
@@ -255,14 +249,15 @@ class MessagesListItem extends StatelessWidget {
 
       final hasLastMessage = groupConversation.lastMessage != null;
 
-      final message = hasLastMessage ? groupConversation.lastMessage : null;
+      final message = hasLastMessage
+          ? groupConversation.lastMessage! as GroupMessage
+          : null;
 
       final conversationUser = message?.senderInfo;
 
       String senderName() {
         // currrent user sent last message
-        if (hasLastMessage &&
-            groupConversation.lastMessage!.isMessageFromCurrentUser(user.id)) {
+        if (hasLastMessage && message!.isMessageFromCurrentUser(user.id)) {
           return 'You';
         }
         // recipient sent last message
@@ -275,10 +270,7 @@ class MessagesListItem extends StatelessWidget {
         child: Container(
           height: 72,
           width: context.width,
-          padding: const EdgeInsets.only(
-            left: 9,
-            right: 8,
-          ),
+          padding: _padding,
           decoration: const BoxDecoration(
             border: Border(top: border, bottom: border),
           ),
@@ -311,15 +303,9 @@ class MessagesListItem extends StatelessWidget {
                     width: context.width * 0.65,
                     child: Text(
                       hasLastMessage
-                          ? '''${senderName()}: ${message!.message}'''
+                          ? '''${senderName()}: ${message?.message}'''
                           : 'Be the first to start the conversation',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.black54,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      style: _lastMessageTextStyle,
                       maxLines: 1,
                     ),
                   ),
@@ -339,6 +325,23 @@ class MessagesListItem extends StatelessWidget {
         ),
       );
     }
+  }
+
+  TextStyle get _lastMessageTextStyle {
+    return const TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      fontStyle: FontStyle.italic,
+      color: Colors.black54,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  EdgeInsets get _padding {
+    return const EdgeInsets.only(
+      left: 9,
+      right: 8,
+    );
   }
 }
 
@@ -373,7 +376,7 @@ class _StartConversationWidgetState extends State<StartConversationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<AuthenticationCubit>().state.user;
+    // final user = context.read<AuthenticationCubit>().state.user;
 
     late String midOrEmail;
 
@@ -384,7 +387,6 @@ class _StartConversationWidgetState extends State<StartConversationWidget> {
         focusNode.unfocus();
         cubit.startConversation(
           recipientMIdOrEmail: midOrEmail,
-          senderMid: user.mID!,
         );
       }
     }

@@ -24,7 +24,7 @@ class FirebaseChat implements IChat {
   final FirebaseStorage _firebaseStorage;
 
   @override
-  Future<MinChatUser> startConversation({
+  Future<Conversation> startConversation({
     required String recipientMIdOrEmail,
     required MinChatUser currentUser,
   }) async {
@@ -63,28 +63,25 @@ class FirebaseChat implements IChat {
       if (userDocument.docs.isNotEmpty) {
         final recipient = userDocument.docs.first.data();
 
-        /// A unique way of creating a docId we can always point to;
-        /// concatenate both user ids and sort.
-        ///
-        /// Note to self: Is sorting the chars really the best way?
-        final docId = '${recipient['id']}${currentUser.id}'.sortChars();
-
         final conversationDocument =
-            _firebaseFirestore.collection('conversations').doc(docId);
+            _firebaseFirestore.collection('conversations').doc();
+
+        final docId = conversationDocument.id;
 
         final recipientUser = MinChatUser.fromMap(recipient);
 
-        final conversationData = {
-          'participantsIds': [recipientUser.id, currentUser.id],
-          'participants': [recipientUser.toMap(), currentUser.toMap()],
-          'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
-          'initiatedBy': currentUser.id,
-          'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
-          'lastMessage': null,
-        };
 
-        await conversationDocument.set(conversationData);
-        return MinChatUser.fromMap(recipient);
+        final conversation = Conversation(
+          participants: [recipientUser, currentUser],
+          initiatedBy: currentUser.id,
+          initiatedAt: DateTime.now(),
+          lastUpdatedAt: DateTime.now(),
+          documentId: docId,
+          participantsIds: [recipientUser.id, currentUser.id],
+        );
+
+        await conversationDocument.set(conversation.toMap());
+        return conversation;
       } else {
         throw Exception('User not found!');
       }
@@ -94,10 +91,13 @@ class FirebaseChat implements IChat {
   }
 
   @override
-  Future<void> sendMessage({required Message message}) async {
+  Future<void> sendMessage({
+    required Message message,
+    required String id,
+  }) async {
     try {
       // generate unique docId for the shared conversation
-      final docId = '${message.recipientId}${message.senderId}'.sortChars();
+      final docId = id;
 
       // recipient and sender conversation document
       final conversationDocument =
@@ -139,10 +139,11 @@ class FirebaseChat implements IChat {
   Future<void> sendVoiceMessage({
     required Message message,
     required String filePath,
+    required String id,
   }) async {
     try {
       // generate unique docId for the shared conversation
-      final docId = '${message.recipientId}${message.senderId}'.sortChars();
+      final docId = id;
 
       // recipient and sender conversation document
       final conversationDocument =
@@ -295,12 +296,11 @@ class FirebaseChat implements IChat {
 
   @override
   Stream<List<Message>> messageStream({
-    required String recipientId,
-    required String senderId,
+    required String id,
   }) =>
       _firebaseFirestore
           .collection('conversations')
-          .doc('$recipientId$senderId'.sortChars())
+          .doc(id)
           .collection('messages')
           .orderBy('timestamp')
           .snapshots()
@@ -397,7 +397,7 @@ class FirebaseChat implements IChat {
   }
 
   @override
-  Future<void> startAGroupConversation({
+  Future<GroupConversation> startAGroupConversation({
     required GroupConversation conversation,
   }) async {
     try {
@@ -405,10 +405,16 @@ class FirebaseChat implements IChat {
       final groupConversationDoc =
           _firebaseFirestore.collection('group-conversations').doc();
 
+      final conversationMap = conversation.toMap()
+        ..addAll({'documentId': groupConversationDoc.id});
+
       // add a conversation
       await groupConversationDoc.set(
-        conversation.toMap()..addAll({'documentId': groupConversationDoc.id}),
+        conversationMap,
       );
+
+      // print(conversationMap.toString());
+      return GroupConversation.fromMap(conversationMap);
     } catch (e) {
       throw Exception(e);
     }

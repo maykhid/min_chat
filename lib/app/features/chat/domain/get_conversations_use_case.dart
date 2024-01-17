@@ -11,7 +11,7 @@ class GetConversationsUseCase {
 
   final ChatRepository _chatRepository;
 
-  Stream<List<dynamic>> conversationStreams({
+  Stream<List<BaseConversation>> conversationStreams({
     required String userId,
   }) {
     final conversationStream =
@@ -20,11 +20,11 @@ class GetConversationsUseCase {
         _chatRepository.groupConversationStream(userId: userId);
 
     return Rx.combineLatest2<List<Conversation>, List<GroupConversation>,
-        List<SortableConversation>>(
+        List<BaseConversation>>(
       conversationStream,
       groupConversationStream,
       (conversations, groupConversations) {
-        final combinedList = <SortableConversation>[
+        final combinedList = <BaseConversation>[
           ...conversations,
           ...groupConversations,
         ]..sort((a, b) => b.lastUpdatedAt.compareTo(a.lastUpdatedAt));
