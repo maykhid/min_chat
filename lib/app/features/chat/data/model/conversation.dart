@@ -83,6 +83,7 @@ class Conversation extends BaseConversation with EquatableMixin {
       'participants': participants.map((user) => user.toMap()).toList(),
       'lastUpdatedAt': lastUpdatedAt.millisecondsSinceEpoch,
       'participantsIds': participantsIds,
+      'documentId': documentId,
       'lastMessage': lastMessage?.toMap(),
     };
     return {...baseMap, ...additionalInfo()};
