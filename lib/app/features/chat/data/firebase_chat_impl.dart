@@ -63,12 +63,6 @@ class FirebaseChat implements IChat {
       if (userDocument.docs.isNotEmpty) {
         final recipient = userDocument.docs.first.data();
 
-        // /// A unique way of creating a docId we can always point to;
-        // /// concatenate both user ids and sort.
-        // ///
-        // /// Note to self: Is sorting the chars really the best way?
-        // final docId = '${recipient['id']}${currentUser.id}'.sortChars();
-
         final conversationDocument =
             _firebaseFirestore.collection('conversations').doc();
 
@@ -76,15 +70,6 @@ class FirebaseChat implements IChat {
 
         final recipientUser = MinChatUser.fromMap(recipient);
 
-        // final conversationData = {
-        //   'participantsIds': [recipientUser.id, currentUser.id],
-        //   'participants': [recipientUser.toMap(), currentUser.toMap()],
-        //   'initiatedAt': Timestamp.now().millisecondsSinceEpoch,
-        //   'initiatedBy': currentUser.id,
-        //   'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
-        //   'lastMessage': null,
-        //   'documentId': docId,
-        // };
 
         final conversation = Conversation(
           participants: [recipientUser, currentUser],
