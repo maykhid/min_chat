@@ -44,6 +44,8 @@ Contributions are highly welcome!
     * Replace ```<your-firebase-project-name>``` with the actual name of your Firebase project. 
     
     * Follow the prompts to select platforms and provide any necessary credentials.
+
+After completing the setup ensure your google_services.json, GoogleService-Info.plist and firebase_options.dart files are generated.
     
 3.  Make sure the following are enabled on your Firebase project
     * Authentication
