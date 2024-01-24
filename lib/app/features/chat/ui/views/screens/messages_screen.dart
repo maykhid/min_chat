@@ -16,7 +16,7 @@ import 'package:min_chat/app/features/chat/ui/cubits/start_conversation_cubit.da
 import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/group_chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/start_groupchat_screen.dart';
-import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
+import 'package:min_chat/app/features/user/ui/user_screen.dart';
 import 'package:min_chat/app/shared/ui/app_button.dart';
 import 'package:min_chat/app/shared/ui/app_dialog.dart';
 import 'package:min_chat/app/shared/ui/app_expandable_fab.dart';
@@ -80,13 +80,18 @@ class MessagesScreenView extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    InkWell(
-                      onTap: () => context.push(
-                        UserOptionsScreen.name,
-                      ),
-                      child: CircleAvatar(
-                        radius: 15,
-                        backgroundImage: NetworkImage(user.imageUrl!),
+                    Hero(
+                      tag: 'circleavatar',
+                      child: Material(
+                        child: InkWell(
+                          onTap: () => context.push(
+                            UserScreen.name,
+                          ),
+                          child: CircleAvatar(
+                            radius: 15,
+                            backgroundImage: NetworkImage(user.imageUrl!),
+                          ),
+                        ),
                       ),
                     ),
                   ],

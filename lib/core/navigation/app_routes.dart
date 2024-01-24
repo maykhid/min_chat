@@ -8,7 +8,7 @@ import 'package:min_chat/app/features/chat/ui/views/screens/chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/group_chat_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/messages_screen.dart';
 import 'package:min_chat/app/features/chat/ui/views/screens/start_groupchat_screen.dart';
-import 'package:min_chat/app/features/user/ui/user_options_screen.dart';
+import 'package:min_chat/app/features/user/ui/user_screen.dart';
 
 class AppRoutes {
   static List<GoRoute> routes = [
@@ -63,9 +63,9 @@ class AppRoutes {
     ),
 
     GoRoute(
-      path: UserOptionsScreen.name,
+      path: UserScreen.name,
       name: 'userOptions',
-      builder: (context, state) => const UserOptionsScreen(),
+      builder: (context, state) => const UserScreen(),
     ),
 
     GoRoute(
