@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:min_chat/app/features/auth/ui/cubit/authentication_cubit.dart';
@@ -23,6 +24,7 @@ class TextVoiceBoxToggler extends StatefulWidget {
   });
 
   final BaseConversation conversation;
+
   /// A null [recipientId] typically means this is a group conversation
   /// and should be treated as such
   final String? recipientId;
@@ -237,7 +239,15 @@ class _MessagingTextBoxState extends State<MessagingTextBox>
                       ),
                     ] else ...[
                       CustomCircularIconButton(
-                        onPressed: () => print('Tap and hold to record'),
+                        onPressed: () => Fluttertoast.showToast(
+                          fontSize: 12,
+                          msg: 'Press and hold to start recording...',
+                          
+                          timeInSecForIosWeb: 2,
+                          gravity: ToastGravity
+                              .BOTTOM, // Also possible "TOP" and "CENTER"
+                          backgroundColor: Colors.black,
+                        ),
                         onLongPress: textOrVoiceController.textVoiceToggle,
                         icon: FontAwesomeIcons.microphone,
                       ),

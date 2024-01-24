@@ -73,11 +73,12 @@ class UserScreen extends StatelessWidget {
                 ),
                 onTap: () => FlutterClipboard.copy(user.state.user.mID!).then(
                   (_) => Fluttertoast.showToast(
+                    fontSize: 12,
                     msg: 'mID copied successfully!',
                     toastLength: Toast.LENGTH_SHORT,
                     gravity:
                         ToastGravity.BOTTOM, // Also possible "TOP" and "CENTER"
-                    backgroundColor: Colors.blueGrey,
+                    backgroundColor: Colors.black,
                   ),
                 ),
               ),
