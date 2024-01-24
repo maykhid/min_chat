@@ -45,7 +45,7 @@ Contributions are highly welcome!
     
     * Follow the prompts to select platforms and provide any necessary credentials.
 
-After completing the setup ensure your google_services.json, GoogleService-Info.plist and firebase_options.dart files are generated.
+    After completing the setup, please make sure your google_services.json, GoogleService-Info.plist and firebase_options.dart files are generated.
     
 3.  Make sure the following are enabled on your Firebase project
     * Authentication
@@ -54,7 +54,14 @@ After completing the setup ensure your google_services.json, GoogleService-Info.
   
 Troubleshooting:
 
-If you encounter any issues, consult the FlutterFire documentation or check the issues or create a new one. 
+If you have any issues, please consult the FlutterFire documentation to check the issues or create a new one. 
+
+## ⚙️ How to use
+MinChat is simple to use. 
+
+To begin a normal conversation (p2p chat), you must have the recipient's mID or the email they used during registration (You can find your mID on the user page which can be found when you click the user profile picture). Click the floating action button to show an expanded floating action button, select the user icon enter the user's mID or email address and press `OK`.
+
+To begin a group chat/conversation, the group participants you can add are people you have started a regular chat (p2p chat) with (You cannot add any participants if you haven't any persons you chat with). Click the floating action button to show expanded floating action buttons, and select the group icon, a list of people you started a conversation with is shown, select the ones to add to the group then press `Start Conversation`, then you're prompted to enter a desired name for this group.
 
 ## ✍️ Author
 Henry Ifebunandu
