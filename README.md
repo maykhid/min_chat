@@ -9,7 +9,7 @@ Leave a star⭐️ if you like what you see.
 
 Contributions are highly welcome!
 
-<a href="ss/app.apk"><img src="https://playerzon.com/asset/download.png" width="200"></img></a>
+<a href="https://drive.google.com/file/d/18sy49tN9OuTGA6b2BSEyy3HHYSuPOQOI/view?usp=sharing"><img src="https://playerzon.com/asset/download.png" width="200"></img></a>
 
 ## 🖼 Screenshots
 | ![Auth Image](https://github.com/maykhid/min_chat/blob/main/screenshots/auth.png?raw=true) | ![No Chat Image](https://github.com/maykhid/min_chat/blob/main/screenshots/no_chat.png?raw=true) | ![Start Conversation Image](https://github.com/maykhid/min_chat/blob/main/screenshots/start_conversation.png?raw=true) |
