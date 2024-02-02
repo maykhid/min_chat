@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:min_chat/app/features/chat/data/chat_repository.dart';
@@ -63,6 +66,8 @@ class SendMessageCubit extends Cubit<SendMessageState> {
       emit(SendMessageState.failed(message: response.errorMessage));
     } else {
       emit(const SendMessageState.done());
+      // clear audio file
+      _clearTempFile(filePath);
     }
   }
 
@@ -82,6 +87,16 @@ class SendMessageCubit extends Cubit<SendMessageState> {
       emit(SendMessageState.failed(message: response.errorMessage));
     } else {
       emit(const SendMessageState.done());
+      // clear audio file
+      _clearTempFile(filePath);
+    }
+  }
+
+  /// simple helper function to delete audio recording file
+  void _clearTempFile(String filePath) {
+    final file = File(filePath);
+    if (file.existsSync()) {
+      unawaited(file.delete());
     }
   }
 }

@@ -111,7 +111,7 @@ class RecordVoiceRecorder implements VoiceRecorder {
 
         const config = RecordConfig(numChannels: 1);
 
-        final dir = await getApplicationDocumentsDirectory();
+        final dir = await getTemporaryDirectory();
         final filePath = p.join(
           dir.path,
           'audio_${DateTime.now().millisecondsSinceEpoch}.m4a',

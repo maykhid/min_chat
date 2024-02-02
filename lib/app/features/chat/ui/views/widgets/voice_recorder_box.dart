@@ -268,7 +268,7 @@ class _RecorderControlsState extends State<_RecorderControls> {
   void _playToneOnSendRecord() {
     _audioPlayer.play(
       AssetSource('sounds/send-recording.wav'),
-      volume: 0.3,
+      volume: 0.5,
     );
   }
 
