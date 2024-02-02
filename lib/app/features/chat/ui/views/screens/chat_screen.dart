@@ -72,12 +72,23 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       const SizedBox(
                         width: 8,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          recipientUser.name!,
-                          // style: AppTextStyles.normalTextStyleDark,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            recipientUser.name!,
+                            // style: AppTextStyles.normalTextStyleDark,
+                          ),
+                          Text(
+                            recipientUser.mID!,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
+                            // style: AppTextStyles.normalTextStyleDark,
+                          ),
+                        ],
                       ),
                     ],
                   ),
