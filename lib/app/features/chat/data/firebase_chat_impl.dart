@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -69,7 +70,6 @@ class FirebaseChat implements IChat {
         final docId = conversationDocument.id;
 
         final recipientUser = MinChatUser.fromMap(recipient);
-
 
         final conversation = Conversation(
           participants: [recipientUser, currentUser],
@@ -187,6 +187,9 @@ class FirebaseChat implements IChat {
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
         'lastMessage': messageAsMap,
       });
+
+      // clear audio file no longer needed
+      _clearTempFile(filePath);
     } catch (e) {
       throw Exception(e);
     }
@@ -289,6 +292,9 @@ class FirebaseChat implements IChat {
         'lastUpdatedAt': Timestamp.now().millisecondsSinceEpoch,
         'lastMessage': messageAsMap,
       });
+
+      // clear audio file no longer needed
+      _clearTempFile(filePath);
     } catch (e) {
       throw Exception(e);
     }
@@ -418,5 +424,13 @@ class FirebaseChat implements IChat {
     } catch (e) {
       throw Exception(e);
     }
+  }
+}
+
+/// simple helper function to delete file
+void _clearTempFile(String filePath) {
+  final file = File(filePath);
+  if (file.existsSync()) {
+    unawaited(file.delete());
   }
 }

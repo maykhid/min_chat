@@ -66,8 +66,6 @@ class SendMessageCubit extends Cubit<SendMessageState> {
       emit(SendMessageState.failed(message: response.errorMessage));
     } else {
       emit(const SendMessageState.done());
-      // clear audio file
-      _clearTempFile(filePath);
     }
   }
 
@@ -87,16 +85,6 @@ class SendMessageCubit extends Cubit<SendMessageState> {
       emit(SendMessageState.failed(message: response.errorMessage));
     } else {
       emit(const SendMessageState.done());
-      // clear audio file
-      _clearTempFile(filePath);
-    }
-  }
-
-  /// simple helper function to delete audio recording file
-  void _clearTempFile(String filePath) {
-    final file = File(filePath);
-    if (file.existsSync()) {
-      unawaited(file.delete());
     }
   }
 }
