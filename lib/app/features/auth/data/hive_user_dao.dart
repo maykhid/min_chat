@@ -11,22 +11,22 @@ class HiveUserDao implements UserDao {
 
   final Box<MinChatUser> _userBox;
 
-  static const String key = '__user__key__';
+  static const String _key = '__user__key__';
 
   @override
   MinChatUser readUser() {
     if (_userBox.isEmpty) {
       return MinChatUser.empty;
     }
-    return _userBox.get(key) ?? MinChatUser.empty;
+    return _userBox.get(_key) ?? MinChatUser.empty;
   }
 
   @override
   void writeUser(MinChatUser authenticatedUser) =>
-      _userBox.put(key, authenticatedUser);
+      _userBox.put(_key, authenticatedUser);
 
   @override
-  void deleteUser() => _userBox.delete(key);
+  void deleteUser() => _userBox.delete(_key);
 
   @override
   bool get userExists => _userBox.isNotEmpty;
