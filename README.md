@@ -49,7 +49,7 @@ Contributions are highly welcome!
     
 3.  Make sure the following are enabled on your Firebase project
     * Authentication
-    * Firestore Database
+    * Firestore Database - (For more info on the database model or structure read [this](https://medium.com/@henryifebunandu/cloud-firestore-db-structure-for-your-chat-application-64ec77a9f9c0) )
     * Storage
   
 Troubleshooting:
