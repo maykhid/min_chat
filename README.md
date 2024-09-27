@@ -63,5 +63,11 @@ To begin a normal conversation (p2p chat), you must have the recipient's mID or 
 
 To begin a group chat/conversation, the group participants you can add are people you have started a regular chat (p2p chat) with (You cannot add any participants if you haven't any persons you chat with). Click the floating action button to show expanded floating action buttons, and select the group icon, a list of people you started a conversation with is shown, select the ones to add to the group then press `Start Conversation`, then you're prompted to enter a desired name for this group.
 
+## ⚖️ Licences
+This project is licensed under the Creative Commons Attribution 4.0 International License. You may distribute, remix, tweak, and build upon this work, even commercially, as long as you credit the original author.
+
+**For more information, please see:** https://creativecommons.org/licenses/by/4.0/
+
+
 ## ✍️ Author
 Henry Ifebunandu
